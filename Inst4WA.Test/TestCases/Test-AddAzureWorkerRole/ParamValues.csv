@@ -1,0 +1,22 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+AzureNodeSdkLoc,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure,YES,,,FALSE
+CloudServiceDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.CloudService.dll,YES,,,FALSE
+MgmtDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.dll,YES,,,FALSE
+WorkerRoleDir,C:\temp\helloworldworkerRole,YES,,,FALSE
+WorkerRoleServiceName,HelloWorldWorkerRole,YES,,,FALSE
+WorkerRoleBinaries,TestData\WorkerRole\bin,YES,,,FALSE
+WorkerRoleBinaries,C:\NonExisting\WebRole,YES,,,TRUE
+WorkerRoleBinaries,,YES,,,TRUE
+WorkerRoleCSCFG,TestData\WorkerRole\ServiceConfiguration.Local.cscfg,YES,,,FALSE
+WorkerRoleCSCFG,C:\NonExisting\ServiceConfiguration.Local.cscfg,YES,,,TRUE
+WorkerRoleCSCFG,,YES,,,TRUE
+WorkerRoleCSDEF,TestData\WorkerRole\ServiceDefinition.csdef,YES,,,FALSE
+WorkerRoleCSDEF,C:\NonExisting\ServiceDefinition.csdef,YES,,,TRUE
+WorkerRoleCSDEF,,YES,,,TRUE
+WorkerRoleName,WorkerRole,YES,,,FALSE
+WorkerRoleName,InvalidRoleName,YES,,,TRUE
+WorkerRoleName,,YES,,,TRUE
+WorkerRoleVMSize,Small,NO,,,FALSE
+WorkerRoleVMSize,,NO,,,TRUE
+WorkerRoleInstCnt,1,NO,,,FALSE
+WorkerRoleInstCnt,,NO,,,TRUE

@@ -1,0 +1,4 @@
+Command, Name, ParameterName, Name, ParameterName
+Cmdlet:New-ApplicationDirectory,AppFolder,TestInstallNodeJsModulesLoc,,
+Cmdlet:Invoke-Executable,DownloadLoc,NodeJsDownloadLoc,,
+Cmdlet:Install-NodeJsModules,InstallLoc,ModuleInstallLoc,Modules,NodeJsModules

@@ -1,0 +1,3 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+TestNewAppDirLoc,C:\temp\NewAppDir,YES,,,FALSE
+TestNewAppDirLoc,,YES,,,TRUE

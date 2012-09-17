@@ -1,0 +1,19 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+AzureNodeSdkLoc,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure,YES,,,FALSE
+CloudServiceDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.CloudService.dll,YES,,,FALSE
+MgmtDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.dll,YES,,,FALSE
+WebRoleDir,C:\temp\helloworldwebrole,YES,,,FALSE
+WebRoleServiceName,HelloWorldWebRole,YES,,,FALSE
+WebRoleBinaries,TestData\WebRole\bin,YES,,,FALSE
+WebRoleCSCFG,TestData\WebRole\ServiceConfiguration.Local.cscfg,YES,,,FALSE
+WebRoleCSDEF,TestData\WebRole\ServiceDefinition.csdef,YES,,,FALSE
+WebRoleName,WebRole,YES,,,FALSE
+WebRoleVMSize,Small,NO,,,FALSE
+WebRoleInstCnt,1,NO,,,FALSE
+PublishSettingsFile,Azure.publishsettings,YES,,,FALSE
+StorageAccount,blissstorageacc,YES,,,FALSE
+StorageAccount,storageaccountnamemorethantwentyfivecharacters,YES,,,TRUE
+StorageAccount,,YES,,,TRUE
+Location,North Central US,NO,,,FALSE
+Subscription,,YES,,,FALSE
+Emulator,FALSE,YES,,,FALSE

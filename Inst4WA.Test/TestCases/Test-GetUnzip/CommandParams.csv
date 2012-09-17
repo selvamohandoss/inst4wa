@@ -1,0 +1,3 @@
+Command, Name, ParameterName, Name, ParameterName
+Cmdlet:New-ApplicationDirectory,AppFolder,NewAppDir,,
+Cmdlet:Get-Unzip,Url,GetUnzipUrl,UnzipLoc,GetUnzipLoc

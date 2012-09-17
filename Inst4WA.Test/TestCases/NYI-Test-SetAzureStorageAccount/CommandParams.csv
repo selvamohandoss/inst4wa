@@ -1,0 +1,9 @@
+Command, Name, ParameterName, Name, ParameterName, Name, ParameterName, Name, ParameterName, Name, ParameterName, Name, ParameterName
+Cmdlet:Install-AzureSdkForNodeJs,AzureNodeSdkLoc,AzureNodeSdkLoc,,,,,,,,,,
+Cmdlet:Add-LoadAssembly.1,CmdletsAssemblyPath,CloudServiceDll,,,,,,,,,,
+Cmdlet:Add-LoadAssembly.2,CmdletsAssemblyPath,MgmtDll,,,,,,,,,,
+Cmdlet:New-ApplicationDirectory,AppFolder,WebRoleDir,,,,,,,,,,
+Cmdlet:New-AzureServiceProject,ServiceName,WebRoleServiceName,,,,,,,,,,
+Cmdlet:Add-AzureWebRole,RoleBinariesFolder,WebRoleBinaries,CSCFGFile,WebRoleCSCFG,CSDEFFile,WebRoleCSDEF,RoleName,WebRoleName,VMSize,WebRoleVMSize,InstanceCount,WebRoleInstCnt
+ChangeWorkingDir:,WorkingDir,WebRoleDir,,,,,,,,,,
+Cmdlet:Set-AzureStorageAccount,PublishSettingsFile,PublishSettingsFile,Subscription,Subscription,StorageAccount,StorageAccount,Location,Location,,,,

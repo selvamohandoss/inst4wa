@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "HelloWorld.WorkerRole", "HelloWorld.WorkerRole\HelloWorld.WorkerRole.ccproj", "{3780C07C-9D86-45D7-9D4F-57981CFD436A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerRole", "WorkerRole\WorkerRole.csproj", "{B218167F-E31D-430B-A04A-C4F85833326B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3780C07C-9D86-45D7-9D4F-57981CFD436A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3780C07C-9D86-45D7-9D4F-57981CFD436A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3780C07C-9D86-45D7-9D4F-57981CFD436A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3780C07C-9D86-45D7-9D4F-57981CFD436A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B218167F-E31D-430B-A04A-C4F85833326B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B218167F-E31D-430B-A04A-C4F85833326B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B218167F-E31D-430B-A04A-C4F85833326B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B218167F-E31D-430B-A04A-C4F85833326B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

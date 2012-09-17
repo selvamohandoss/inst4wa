@@ -1,0 +1,22 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+AzureNodeSdkLoc,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure,YES,,,FALSE
+CloudServiceDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.CloudService.dll,YES,,,FALSE
+MgmtDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.dll,YES,,,FALSE
+WebRoleDir,C:\temp\helloworldwebrole,YES,,,FALSE
+WebRoleServiceName,HelloWorldWebRole,YES,,,FALSE
+WebRoleBinaries,TestData\WebRole\bin,YES,,,FALSE
+WebRoleBinaries,C:\NonExisting\WebRole,YES,,,TRUE
+WebRoleBinaries,,YES,,,TRUE
+WebRoleCSCFG,TestData\WebRole\ServiceConfiguration.Local.cscfg,YES,,,FALSE
+WebRoleCSCFG,C:\NonExisting\ServiceConfiguration.Local.cscfg,YES,,,TRUE
+WebRoleCSCFG,,YES,,,TRUE
+WebRoleCSDEF,TestData\WebRole\ServiceDefinition.csdef,YES,,,FALSE
+WebRoleCSDEF,C:\NonExisting\ServiceDefinition.csdef,YES,,,TRUE
+WebRoleCSDEF,,YES,,,TRUE
+WebRoleName,WebRole,YES,,,FALSE
+WebRoleName,InvalidRoleName,YES,,,TRUE
+WebRoleName,,YES,,,TRUE
+WebRoleVMSize,Small,NO,,,FALSE
+WebRoleVMSize,,NO,,,TRUE
+WebRoleInstCnt,1,NO,,,FALSE
+WebRoleInstCnt,,NO,,,TRUE

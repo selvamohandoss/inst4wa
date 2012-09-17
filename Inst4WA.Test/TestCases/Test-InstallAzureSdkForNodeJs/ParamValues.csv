@@ -1,0 +1,3 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+AzureNodeSdkLoc,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure,YES,,,FALSE
+AzureNodeSdkLoc,,YES,,,TRUE

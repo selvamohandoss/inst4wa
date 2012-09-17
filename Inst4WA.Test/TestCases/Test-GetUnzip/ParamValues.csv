@@ -1,0 +1,7 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+GetUnzipUrl,http://mirror.cc.columbia.edu/pub/software/apache/lucene/solr/3.6.1/apache-solr-3.6.1.zip,YES,,,FALSE
+GetUnzipUrl,,YES,,,TRUE
+GetUnzipUrl,C:\temp,YES,,,TRUE
+GetUnzipLoc,C:\temp\TestUnzip,YES,,,FALSE
+GetUnzipLoc,,YES,,,TRUE
+NewAppDir,C:\temp\TestUnzip,YES,,,FALSE

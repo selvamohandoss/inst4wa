@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="HelloWorld.WorkerRole" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="1" osVersion="*" schemaVersion="2012-05.1.7">
+  <Role name="WorkerRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=ramstg;AccountKey=lDkS+l0lYys7Y/+VT60l0lLqSWbMMDfDhOVz6/GK7N/2GEj7M2eUCSe8EfDuzbVvBd9HGLVOz6najaSCWYWsPg==" />
+      <Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=http;AccountName=ramstg;AccountKey=lDkS+l0lYys7Y/+VT60l0lLqSWbMMDfDhOVz6/GK7N/2GEj7M2eUCSe8EfDuzbVvBd9HGLVOz6najaSCWYWsPg==" />
+    </ConfigurationSettings>
+  </Role>
+</ServiceConfiguration>

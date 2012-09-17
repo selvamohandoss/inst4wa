@@ -1,0 +1,9 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+NodeJsDownloadLoc,http://nodejs.org/dist/v0.6.19/node-v0.6.19.msi,YES,,,FALSE
+TestInstallNodeJsModulesLoc,C:\temp\NodeJsModules,YES,,,FALSE
+ModuleInstallLoc,C:\temp\NodeJsModules,YES,,,FALSE
+ModuleInstallLoc,C:\NonExistingPath,YES,,,TRUE
+ModuleInstallLoc,  ,YES,,,TRUE
+NodeJsModules,azure express jade,YES,,,FALSE
+NodeJsModules,,YES,,,TRUE
+NodeJsModules,nonexistingmodule azure express jade,YES,,,TRUE

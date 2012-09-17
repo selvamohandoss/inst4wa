@@ -1,0 +1,4 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
+TestLocInvokeExe,https://github.com/downloads/dch/couchdb/setup-couchdb-1.1.1_js185_otp_R14B03+fix-win32-crypto.exe,YES,,,FALSE
+TestLocInvokeExe,,YES,,,TRUE
+TestLocInvokeExe,http:@InvalidURI,YES,,,TRUE

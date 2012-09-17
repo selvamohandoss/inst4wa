@@ -1,0 +1,62 @@
+<DeploymentModel  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!--
+      Test Command
+      Inst4WA.exe -XmlConfigPath HelloWorldWorkerRole.xml
+  -->
+  <Parameters>
+    <Parameter Name="Emulator" Value="true"></Parameter>
+
+    <Parameter Name="AzureDeploymentCmdletsAssemblyPath"
+               Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.CloudService.dll" Required="yes"></Parameter>
+    <Parameter Name="AzureMgmtCmdletsAssemblyPath"
+           Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.dll" Required="yes"></Parameter>
+
+    <Parameter Name="AppFolder" Value="C:\temp\WorkerRoleOnEmul"></Parameter>
+    <Parameter Name="AppName" Value="HelloWorld"></Parameter>
+
+    <Parameter Name="RoleBinaries" Value="TestData\WorkerRole\bin"></Parameter>
+    <Parameter Name="CSCFGFile" Value="TestData\WorkerRole\ServiceConfiguration.Local.cscfg"></Parameter>
+    <Parameter Name="CSDEFFile" Value="TestData\WorkerRole\ServiceDefinition.csdef"></Parameter>
+    
+    <Parameter Name="RoleName" Value="WorkerRole"></Parameter>
+    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure" Name="AzureNodeJsSdkPath"/>
+  </Parameters>
+  <Steps>
+
+    <Step Type="Cmdlet" Command="Install-AzureSdkForNodeJs" Message="Installing Windows Azure PowerShell for Node.JS">
+      <CommandParam Name="AzureNodeSdkLoc" ParameterName="AzureNodeJsSdkPath" />
+    </Step>
+
+    <!--Load Azure SDK Dll's-->
+    <Step Type="Cmdlet" Command="Add-LoadAssembly" Message="Loading Windows Azure PowerShell for Node.JS">
+      <CommandParam Name="CmdletsAssemblyPath" ParameterName="AzureDeploymentCmdletsAssemblyPath" />
+    </Step>
+    <Step Type="Cmdlet" Command="Add-LoadAssembly" Message="Loading Windows Azure PowerShell for Node.JS">
+      <CommandParam Name="CmdletsAssemblyPath" ParameterName="AzureMgmtCmdletsAssemblyPath" />
+    </Step>
+    
+    <!--Create Empty App-->
+    <Step Type="Cmdlet" Command="New-ApplicationDirectory" Message="Creating application directory">
+      <CommandParam Name="AppFolder" ParameterName="AppFolder" />
+    </Step>
+    <Step Message="Changing to application directory" Command="" Type="ChangeWorkingDir">
+      <CommandParam Name="WorkingDir" ParameterName="AppFolder"/>
+    </Step>
+    <Step Message="Creating new Azure service" Command="New-AzureServiceProject" Type="Cmdlet">
+      <CommandParam Name="ServiceName" ParameterName="AppName"/>
+    </Step>
+
+    <!--Create Worker Role-->
+    <Step Type="Cmdlet" Command="Add-AzureWorkerRole" Message="Creating hello world worker role.">
+      <CommandParam Name="RoleBinariesFolder" ParameterName="RoleBinaries" />
+      <CommandParam Name="CSCFGFile" ParameterName="CSCFGFile" />
+      <CommandParam Name="CSDEFFile" ParameterName="CSDEFFile" />
+      <CommandParam Name="RoleName" ParameterName="RoleName" />
+    </Step>
+
+    <Step Type="Cmdlet" Command="Start-AzureEmulator -launch" Message="Deploying CouchDb inside Emulator">
+    </Step>
+   
+  </Steps>
+</DeploymentModel>
