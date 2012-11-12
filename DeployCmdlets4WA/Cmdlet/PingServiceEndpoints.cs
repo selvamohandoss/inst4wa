@@ -33,6 +33,7 @@ using DeployCmdlets4WA.ServiceProxy;
 using System.Security.Cryptography.X509Certificates;
 using DeployCmdlets4WA.Utilities;
 using System.Net.Sockets;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
@@ -57,7 +58,7 @@ namespace DeployCmdlets4WA.Cmdlet
 
         protected override void ProcessRecord()
         {
-            PreValidate();
+            PreValidate(this.PublishSettingsFile);
 
             base.ProcessRecord();
 
@@ -67,11 +68,11 @@ namespace DeployCmdlets4WA.Cmdlet
             PingEndPoints(serviceEndpoints);
         }
 
-        private void PreValidate()
+        private static void PreValidate(string publishSettingsFile)
         {
-            if (File.Exists(this.PublishSettingsFile) == false)
+            if (File.Exists(publishSettingsFile) == false)
             {
-                throw new ArgumentException(string.Format(Resources.FileDoesNotExist, this.PublishSettingsFile), "PublishSettingsFile");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.FileDoesNotExist, publishSettingsFile), "publishSettingsFile");
             }
         }
 
@@ -80,7 +81,7 @@ namespace DeployCmdlets4WA.Cmdlet
             ClientOutputMessageInspector messageInspector;
             IServiceManagement serviceProxy = ServiceInitializer.Get(this._cert, out messageInspector);
 
-            WriteObject(String.Format(Resources.FetchingEndpoints, ServiceName));
+            WriteObject(String.Format(CultureInfo.InvariantCulture, Resources.FetchingEndpoints, ServiceName));
             HostedService hostedService = serviceProxy.GetHostedServiceProperties(this._subscriptionId, this.ServiceName);
 
             List<IPEndPoint> endPointsToTest = new List<IPEndPoint>();
@@ -119,7 +120,7 @@ namespace DeployCmdlets4WA.Cmdlet
                 retryCountForEndpoint = 0;
                 while (retryCountForEndpoint <= maxRetryCount)
                 {
-                    WriteObject(string.Format(Resources.VerifyingEndpoint, eachEndpoint.Address.ToString(), eachEndpoint.Port.ToString()));
+                    WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.VerifyingEndpoint, eachEndpoint.Address.ToString(), eachEndpoint.Port.ToString(CultureInfo.InvariantCulture)));
                     try
                     {
                         using (Socket s = new Socket(eachEndpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp))
@@ -139,8 +140,8 @@ namespace DeployCmdlets4WA.Cmdlet
                         }
                         else
                         {
-                            WriteObject(string.Format(Resources.VerificationFailedRetry, ex.Message));
-                            throw ex;
+                            WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.VerificationFailedRetry, ex.Message));
+                            throw;
                         }
                     }
                     finally

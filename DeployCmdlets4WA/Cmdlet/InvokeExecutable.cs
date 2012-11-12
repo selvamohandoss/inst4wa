@@ -30,11 +30,12 @@ using Microsoft.Win32;
 using System.IO;
 using System.Net;
 using DeployCmdlets4WA.Properties;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
     [Cmdlet(VerbsLifecycle.Invoke, "Executable")]
-    public class InvokeExecutable : PSCmdlet, IDynamicParameters
+    public class InvokeExecutable : PSCmdlet, IDynamicParameters, IDisposable
     {
         private AutoResetEvent threadBlocker;
         private int downloadProgress;
@@ -53,7 +54,7 @@ namespace DeployCmdlets4WA.Cmdlet
         {
             base.ProcessRecord();
 
-            PreValidate();
+            PreValidate(this.DownloadLoc);
 
             //Cmdlet supports both relative location and web location.
             bool isDownloadLocUri = IsDownloadLocUrl();
@@ -76,15 +77,11 @@ namespace DeployCmdlets4WA.Cmdlet
         }
 
         // validate params and other conditions necessary for the execution of the cmdlet
-        private void PreValidate()
+        private static void PreValidate(string downloadLoc)
         {
-            try
+            if (Uri.IsWellFormedUriString(downloadLoc, UriKind.RelativeOrAbsolute) == false)
             {
-                Uri uri = new Uri(DownloadLoc, UriKind.RelativeOrAbsolute);
-            }
-            catch (Exception exc)
-            {
-                throw new ArgumentException(Resources.InvalidDownloadLocMessage, "DownloadLoc", exc);
+                throw new ArgumentException(Resources.InvalidDownloadLocMessage, "downloadLoc");
             }
         }
 
@@ -95,7 +92,7 @@ namespace DeployCmdlets4WA.Cmdlet
             {
                 if (File.Exists(CheckFile) == false)
                 {
-                    throw new Exception(string.Format(Resources.ErrorExecutingExecutable, CheckFile));
+                    throw new ApplicationFailedException(string.Format(CultureInfo.InvariantCulture, Resources.ErrorExecutingExecutable, CheckFile));
                 }
             }
         }
@@ -141,7 +138,11 @@ namespace DeployCmdlets4WA.Cmdlet
             }
             finally
             {
-                if (threadBlocker != null) { threadBlocker.Close(); }
+                if (threadBlocker != null) 
+                { 
+                    threadBlocker.Close();
+                    threadBlocker = null;
+                }
             }
         }
 
@@ -186,17 +187,17 @@ namespace DeployCmdlets4WA.Cmdlet
             return true;
         }
 
-        private void ValidatePath(string path)
+        private static void ValidatePath(string downloadLoc)
         {
-            if (File.Exists(path) == false)
+            if (File.Exists(downloadLoc) == false)
             {
-                throw new ArgumentException(Resources.InvalidDownloadLocMessage, "DownloadLoc");
+                throw new ArgumentException(Resources.InvalidDownloadLocMessage, "downloadLoc");
             }
         }
 
         private void InstallExe(string loc)
         {
-            String command = String.Format("Start-Process -File \"{0}\" -ArgumentList \"{1}\" -Wait", loc, "/sp- /verysilent /norestart /SUPPRESSMSGBOXES");
+            String command = String.Format(CultureInfo.InvariantCulture, "Start-Process -File \"{0}\" -ArgumentList \"{1}\" -Wait", loc, "/sp- /verysilent /norestart /SUPPRESSMSGBOXES");
             Utilities.ExecuteCommands.ExecuteCommand(command, this.Host);
         }
 
@@ -208,11 +209,11 @@ namespace DeployCmdlets4WA.Cmdlet
             if (string.IsNullOrEmpty(this.ArgumentList) == false)
             {
                 string publicPropVal = GetPublicPropsForMSI();
-                installCmd = String.Format("Start-Process -File msiexec.exe -ArgumentList /qn, /i, \"{0}\", \"{1}\" -Wait", loc, publicPropVal);
+                installCmd = String.Format(CultureInfo.InvariantCulture, "Start-Process -File msiexec.exe -ArgumentList /qn, /i, \"{0}\", \"{1}\" -Wait", loc, publicPropVal);
             }
             else
             {
-                installCmd = String.Format("Start-Process -File msiexec.exe -ArgumentList /qn, /i, \"{0}\" -Wait", loc);
+                installCmd = String.Format(CultureInfo.InvariantCulture, "Start-Process -File msiexec.exe -ArgumentList /qn, /i, \"{0}\" -Wait", loc);
             }
             Utilities.ExecuteCommands.ExecuteCommand(installCmd, this.Host);
         }
@@ -223,9 +224,28 @@ namespace DeployCmdlets4WA.Cmdlet
             foreach (KeyValuePair<string, RuntimeDefinedParameter> eachParam in _runtimeParamsCollection)
             {
                 //If value contain spaces we need to escape quotes with backtick.
-                propStringBuilder.AppendFormat("{0}=`\"{1}`\"", eachParam.Value.Name.ToUpper(), eachParam.Value.Value);
+                propStringBuilder.AppendFormat("{0}=`\"{1}`\"", eachParam.Value.Name.ToUpperInvariant(), eachParam.Value.Value);
             }
             return propStringBuilder.ToString();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // free managed resources
+                if (threadBlocker != null)
+                {
+                    threadBlocker.Close();
+                    threadBlocker = null;
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

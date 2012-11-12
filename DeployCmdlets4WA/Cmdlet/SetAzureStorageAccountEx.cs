@@ -35,11 +35,13 @@ using System.Timers;
 using System.Threading;
 using System.IO;
 using DeployCmdlets4WA.Cmdlet.ServiceConfigurationSchema;
+using System.ServiceModel;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
-    [Cmdlet(VerbsCommon.Set, "AzureStorageAccount")]
-    public class SetAzureStorageAccount : PSCmdlet
+    [Cmdlet(VerbsCommon.Set, "AzureStorageAccountEx")]
+    public class SetAzureStorageAccountEx : PSCmdlet
     {
         private string _storageAccount;
 
@@ -64,7 +66,7 @@ namespace DeployCmdlets4WA.Cmdlet
             }
             set
             {
-                _storageAccount = value.ToLower(); //Storage account name can only have lowercase letters.
+                _storageAccount = value.ToLowerInvariant(); //Storage account name can only have lowercase letters.
             }
         }
 
@@ -80,21 +82,28 @@ namespace DeployCmdlets4WA.Cmdlet
         [ValidateNotNullOrEmpty]
         public string Subscription { get; set; }
 
+        [Parameter(Mandatory = false, HelpMessage = "Set this flag to just create storage account.")]
+        public SwitchParameter CreateOnly { get; set; }
+
+        [Parameter(Mandatory = false, HelpMessage = "Set this flag to set the storage account as default storage account.")]
+        public SwitchParameter SetDefault { get; set; }
+
         protected override void ProcessRecord()
         {
-            PreValidate();
+            PreValidate(this.PublishSettingsFile);
 
             base.ProcessRecord();
 
             Utils.InitPublishSettings(PublishSettingsFile, Subscription, out _publishProfile, out _cert, out _subscriptionId);
+            
             SetStorageAccount();
         }
 
-        private void PreValidate()
+        private void PreValidate(string publishSettingsFile)
         {
-            if (File.Exists(this.PublishSettingsFile) == false)
+            if (File.Exists(publishSettingsFile) == false)
             {
-                throw new ArgumentException(string.Format(Resources.FileDoesNotExist, this.PublishSettingsFile), "PublishSettingsFile");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.FileDoesNotExist, this.PublishSettingsFile), "publishSettingsFile");
             }
 
             //Validate Storage account name.
@@ -110,11 +119,21 @@ namespace DeployCmdlets4WA.Cmdlet
             if (!StorageAccountExists())
             {
                 CreateStorageAccount();
-                WriteObject(string.Format(Resources.StorageAccCreatedMessage, this.StorageAccount));
+                WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.StorageAccCreatedMessage, this.StorageAccount));
             }
             else
             {
-                WriteObject(string.Format(Resources.StorageAccAlreadyExistsMessage, this.StorageAccount));
+                WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.StorageAccAlreadyExistsMessage, this.StorageAccount));
+            }
+
+            if (SetDefault.IsPresent == true)
+            {
+                SetAccountAsDefault();
+            }
+
+            if (CreateOnly.IsPresent == true)
+            {
+                return;
             }
 
             ServiceConfigurationSchema.ServiceConfiguration config = SerializationUtils.DeserializeXmlFile<ServiceConfigurationSchema.ServiceConfiguration>(CloudCSCFGFile);
@@ -123,11 +142,22 @@ namespace DeployCmdlets4WA.Cmdlet
             WriteObject(Resources.StorageAccConfigSuccess);
         }
 
+        private void SetAccountAsDefault()
+        {
+            ExecutePSCmdlet executeSetAzureSubscriptionCmd = new ExecutePSCmdlet();
+            string enableWinRmCmd = "Set-AzureSubscription -CurrentStorageAccount \"{0}\" -SubscriptionName \"{1}\" ";
+            executeSetAzureSubscriptionCmd.Execute(string.Format(CultureInfo.InvariantCulture, Resources.SetDefaultStorageAcc, StorageAccount, Subscription), string.Format(CultureInfo.InvariantCulture, enableWinRmCmd, StorageAccount, Subscription));
+            if (executeSetAzureSubscriptionCmd.ErrorOccurred == true)
+            {
+                throw new ApplicationFailedException(Resources.ErrorSettingDefaultStorageAcc);
+            }
+        }
+
         private void ConfigureRoleStorageAccountKeys(ServiceConfigurationSchema.ServiceConfiguration config, string primaryKey)
         {
             string cloudStorageFormat = "DefaultEndpointsProtocol={0};AccountName={1};AccountKey={2}";
-            string storageHttpKey = string.Format(cloudStorageFormat, "http", this.StorageAccount, primaryKey);
-            string storageHttpsKey = string.Format(cloudStorageFormat, "https", this.StorageAccount, primaryKey);
+            string storageHttpKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormat, "http", this.StorageAccount, primaryKey);
+            string storageHttpsKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormat, "https", this.StorageAccount, primaryKey);
 
             for (int i = 0; i < config.Role.Length; i++)
             {
@@ -141,7 +171,7 @@ namespace DeployCmdlets4WA.Cmdlet
             SerializationUtils.SerializeXmlFile<ServiceConfigurationSchema.ServiceConfiguration>(config, CloudCSCFGFile);
         }
 
-        private void UpdateSetting(ref RoleSettings rs, ServiceConfigurationSchema.ConfigurationSetting cs)
+        private static void UpdateSetting(ref RoleSettings rs, ServiceConfigurationSchema.ConfigurationSetting cs)
         {
             if (rs.ConfigurationSettings == null)
             {
@@ -171,7 +201,26 @@ namespace DeployCmdlets4WA.Cmdlet
             ClientOutputMessageInspector messageInspector;
             IServiceManagement serviceProxy = ServiceInitializer.Get(this._cert, out messageInspector);
             AvailabilityResponse response = serviceProxy.CheckStorageAccountNameAvailability(this._subscriptionId, this.StorageAccount);
-            return !response.IsAvailable.Value;
+
+            if (response.Result == false) //If storage account already exists..verify if it is located in same location supplied in input parameter.
+            {
+                StorageService storageAcctProperties;
+                try
+                {
+                    storageAcctProperties = serviceProxy.GetStorageAccountProperties(this._subscriptionId, this.StorageAccount);
+                }
+                catch (EndpointNotFoundException)
+                {
+                    throw new ApplicationFailedException(string.Format(CultureInfo.InvariantCulture, Resources.StorageAccExistsForDiffSubscription, this.StorageAccount));
+                }
+
+                if (string.IsNullOrEmpty(Location) == false &&
+                    Location.Trim().ToUpperInvariant() != storageAcctProperties.StorageServiceProperties.Location.ToUpperInvariant())
+                {
+                    WriteWarning(Resources.StorageAccDiffLocationWarning);
+                }
+            }
+            return !response.Result;
         }
 
         private void CreateStorageAccount()
@@ -200,15 +249,15 @@ namespace DeployCmdlets4WA.Cmdlet
             {
                 _createRequestToken = ServiceManagementHelpers.CreateStorageAcc(this._subscriptionId, input, this._cert);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 if (IsStorageAccountLimitExceeded() == true)
                 {
-                    throw new Exception(Resources.StorageAccLimitReached);
+                    throw new ApplicationFailedException(Resources.StorageAccLimitReached);
                 }
                 else
                 {
-                    throw ex;
+                    throw;
                 }
             }
             WaitTillCreationComplete();
@@ -236,11 +285,11 @@ namespace DeployCmdlets4WA.Cmdlet
                 {
                     if (IsStorageAccountLimitExceeded() == true)
                     {
-                        throw new Exception(Resources.StorageAccLimitReached);
+                        throw new ApplicationFailedException(Resources.StorageAccLimitReached);
                     }
                     else
                     {
-                        throw new Exception(string.Format(Resources.StorageAccCreationFailed, _createStorageAccStatus));
+                        throw new ApplicationFailedException(string.Format(CultureInfo.InvariantCulture, Resources.StorageAccCreationFailed, _createStorageAccStatus));
                     }
                 }
             }

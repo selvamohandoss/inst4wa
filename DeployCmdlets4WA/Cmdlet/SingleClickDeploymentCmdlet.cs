@@ -35,9 +35,10 @@ using DeployCmdlets4WA.Properties;
 using System.Reflection;
 using System.Management.Automation.Runspaces;
 using System.Management;
+using DeployCmdlets4WA.Utilities;
+using System.Globalization;
 
-
-namespace DeployCmdlets4WA
+namespace DeployCmdlets4WA.Cmdlet
 {
     [Cmdlet(VerbsCommon.New, "DeployOnAzure")]
     public class DeployOnAzure : PSCmdlet, IDynamicParameters
@@ -55,23 +56,23 @@ namespace DeployCmdlets4WA
             public const string ChangeWorkingDir = "ChangeWorkingDir";
             public const string PowershellScript = "Powershell";
             public const string PS1File = "PS1";
+
+            private StepType()
+            { }
         }
 
         private const string programFileNotation = "%%Program Files%%";
+        private const string systemDriveNotation = "%%windir%%";
         private const string publishSettingExtn = ".publishsettings";
 
         private string _publishSettingsPath;
         private bool _isXmlPathValid = true;
         private RuntimeDefinedParameterDictionary _runtimeParamsCollection;
         private AutoResetEvent _threadBlocker;
-        private AutoResetEvent _executePS1Blocker;
         private DeploymentModelHelper _controller;
 
         // method to get Downloads folder path
         private static readonly Guid DownloadsFolderGUID = new Guid("374DE290-123F-4565-9164-39C4925E467B");
-
-        [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
-        static extern int SHGetKnownFolderPath([MarshalAs(UnmanagedType.LPStruct)] Guid rfid, uint dwFlags, IntPtr hToken, out string pszPath);
 
         [Parameter(Mandatory = true)]
         public String XmlConfigPath { get; set; }
@@ -183,6 +184,11 @@ namespace DeployCmdlets4WA
                     {
                         command.AppendFormat(" -{0} ", step.CommandParam[i].Name);
                     }
+                    //Handle the cases where param value begins with @..which indicates that value is hashtable..so dont wrap it in double quotes.
+                    else if (paramValue.StartsWith("@", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        command.AppendFormat(" -{0} {1} ", step.CommandParam[i].Name, paramValue);
+                    }
                     else
                     {
                         command.AppendFormat(" -{0} \"{1}\" ", step.CommandParam[i].Name, paramValue);
@@ -193,11 +199,9 @@ namespace DeployCmdlets4WA
             return command.ToString();
         }
 
-        private bool ExecuteCommand(String command)
+        private static bool ExecuteCommand(String command)
         {
             bool bRet = true;
-            //Console.WriteLine("Executing command:");
-            //Console.WriteLine(command);
 
             try
             {
@@ -205,7 +209,6 @@ namespace DeployCmdlets4WA
                 ps.AddScript(command);
 
                 // Create the output buffer for the results.
-                PSDataCollection<PSObject> output = new PSDataCollection<PSObject>();
                 Collection<PSObject> result = ps.Invoke();
                 foreach (PSObject eachResult in result)
                 {
@@ -226,54 +229,36 @@ namespace DeployCmdlets4WA
             bool bRet = true;
             Console.WriteLine(step.Message);
             Console.WriteLine("File: " + step.Command);
-
             try
             {
-                using (Runspace space = RunspaceFactory.CreateRunspace(this.Host))
-                {
-                    space.Open();
-                    using (PowerShell scriptExecuter = PowerShell.Create())
-                    {
-                        scriptExecuter.Runspace = space;
-                        // if relative, path is relative to dll
-                        string filePath = step.Command;
-                        if (!Path.IsPathRooted(filePath))
-                            filePath = Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), step.Command);
+                string filePath = step.Command;
+                if (!Path.IsPathRooted(filePath))
+                    filePath = Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), step.Command);
 
-                        scriptExecuter.AddCommand(filePath);
-                        if (step.CommandParam != null)
+                Runspace executePs1FileRunspace = Runspace.DefaultRunspace;
+                using (Pipeline executePsCmdletPipeline = executePs1FileRunspace.CreateNestedPipeline())
+                {
+                    Command scriptCommand = new Command(filePath);
+                    if (step.CommandParam != null)
+                    {
+                        for (int i = 0; i < step.CommandParam.Length; i++)
                         {
-                            for (int i = 0; i < step.CommandParam.Length; i++)
+                            DeploymentModelStepsStepCommandParam param = step.CommandParam[i];
+                            String paramValue = GetParamValue(param.ParameterName);
+                            if (String.IsNullOrEmpty(param.Name) == true)
                             {
-                                DeploymentModelStepsStepCommandParam param = step.CommandParam[i];
-                                String paramValue = GetParamValue(param.ParameterName);
-                                if (String.IsNullOrEmpty(param.Name) == true)
-                                {
-                                    scriptExecuter.AddArgument(paramValue);
-                                }
-                                else
-                                {
-                                    scriptExecuter.AddParameter(param.Name, paramValue);
-                                }
+                                scriptCommand.Parameters.Add(null, paramValue);
+                            }
+                            else
+                            {
+                                scriptCommand.Parameters.Add(param.Name, paramValue);
                             }
                         }
-
-                        _executePS1Blocker = new AutoResetEvent(false);
-                        PSDataCollection<PSObject> output = new PSDataCollection<PSObject>();
-
-                        output.DataAdded += new EventHandler<DataAddedEventArgs>(output_DataAdded);
-                        scriptExecuter.InvocationStateChanged += new EventHandler<PSInvocationStateChangedEventArgs>(scriptExecuter_InvocationStateChanged);
-
-                        IAsyncResult asyncResult = scriptExecuter.BeginInvoke<PSObject, PSObject>(null, output);
-                        _executePS1Blocker.WaitOne();
-
-                        PSDataStreams errorStream = scriptExecuter.Streams;
-                        foreach (ErrorRecord error in errorStream.Error)
-                        {
-                            Log(LogType.Error, error.Exception.Message);
-                            bRet = false;
-                        }
                     }
+                    executePsCmdletPipeline.Error.DataReady += new EventHandler(Error_DataReadyExecutePsCmdlet);
+                    executePsCmdletPipeline.Output.DataReady += new EventHandler(Output_DataReadyExecutePsCmdlet);
+                    executePsCmdletPipeline.Commands.Add(scriptCommand);
+                    executePsCmdletPipeline.Invoke();
                 }
             }
             catch (Exception exc)
@@ -281,27 +266,7 @@ namespace DeployCmdlets4WA
                 Log(LogType.Error, "Exception while executing PS1 file: " + exc.Message);
                 bRet = false;
             }
-
             return bRet;
-        }
-
-        void scriptExecuter_InvocationStateChanged(object sender, PSInvocationStateChangedEventArgs e)
-        {
-            if (e.InvocationStateInfo.State == PSInvocationState.Completed)
-            {
-                _executePS1Blocker.Set();
-            }
-        }
-
-        void output_DataAdded(object sender, DataAddedEventArgs e)
-        {
-            PSDataCollection<PSObject> myp = (PSDataCollection<PSObject>)sender;
-
-            Collection<PSObject> results = myp.ReadAll();
-            foreach (PSObject result in results)
-            {
-                Console.WriteLine(result.ToString());
-            }
         }
 
         private bool ExecutePsCmdlet(String beginMessage, String command)
@@ -358,7 +323,7 @@ namespace DeployCmdlets4WA
             bool isIaaS = false;
             string serviceModel = GetParamValue("ServiceModel");
             if (!string.IsNullOrEmpty(serviceModel))
-                isIaaS = (serviceModel.ToLower() == "iaas");
+                isIaaS = (serviceModel.ToUpperInvariant() == "IAAS");
 
             Process.Start(isIaaS ? Resources.AzureIaaSPublishSettingsURL : Resources.AzurePaaSPublishSettingsURL);
             Console.WriteLine("Waiting for publish settings file.");
@@ -372,7 +337,7 @@ namespace DeployCmdlets4WA
                 {
                     string downloadsFolderPath, currentFolderPath;
 
-                    SHGetKnownFolderPath(DownloadsFolderGUID, 0, IntPtr.Zero, out downloadsFolderPath);
+                    NativeMethods.SHGetKnownFolderPath(DownloadsFolderGUID, 0, IntPtr.Zero, out downloadsFolderPath);
                     currentFolderPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                     // set up watchers for both paths and wait until one fires
@@ -421,7 +386,7 @@ namespace DeployCmdlets4WA
             return bRet;
         }
 
-        private FileSystemWatcher SetupFolderWatcher(string folderPath)
+        private static FileSystemWatcher SetupFolderWatcher(string folderPath)
         {
             Console.WriteLine("Watching publish settings folder: " + folderPath);
 
@@ -455,7 +420,7 @@ namespace DeployCmdlets4WA
             _controller = new DeploymentModelHelper(XmlConfigPath);
             _controller.Init();
 
-            IEnumerable<string> paramsForModel = _controller.GetAllParameterNames();
+            IEnumerable<string> paramsForModel = _controller.GetAllParameterNames;
 
             foreach (string paramForModel in paramsForModel)
             {
@@ -475,7 +440,7 @@ namespace DeployCmdlets4WA
         private bool ValidateParameters()
         {
             bool bRet = true;
-            IEnumerable<string> paramsForModel = _controller.GetAllParameterNames();
+            IEnumerable<string> paramsForModel = _controller.GetAllParameterNames;
 
             foreach (string paramForModel in paramsForModel)
             {
@@ -545,10 +510,11 @@ namespace DeployCmdlets4WA
         /// <summary>
         /// Method to replace special notations inside param values with actual values.
         /// Currently %%Program Files%% will be replaced with -- [WINDIR]:\Progam Files(x86) for 64 Bit OS & [WINDIR]:\Progam Files for 32 Bit OS
+        /// %%windir%% will be replaced with - [WINDIR]
         /// </summary>
         /// <param name="paramValue">Param value to be processed</param>
         /// <returns>Processed param value</returns>
-        private string ReplaceNotations(string paramValue)
+        private static string ReplaceNotations(string paramValue)
         {
             string formattedValue = paramValue;
             if (paramValue.Contains(programFileNotation) == true)
@@ -556,10 +522,15 @@ namespace DeployCmdlets4WA
                 string programFileLoc = GetProgramFileLocation();
                 formattedValue = formattedValue.Replace(programFileNotation, programFileLoc);
             }
+            else if (paramValue.Contains(systemDriveNotation) == true)
+            {
+                string winDir = GetWinDir();
+                formattedValue = formattedValue.Replace(systemDriveNotation, winDir);
+            }
             return formattedValue;
         }
 
-        private string GetProgramFileLocation()
+        private static string GetProgramFileLocation()
         {
             string windir = GetWinDir();
             string programFileLocation = string.Empty;
@@ -580,7 +551,7 @@ namespace DeployCmdlets4WA
             return programFileLocation;
         }
 
-        private string GetWinDir()
+        private static string GetWinDir()
         {
             string windirEnvVar = Environment.GetEnvironmentVariable("windir");
             return Path.GetPathRoot(windirEnvVar);
@@ -598,9 +569,19 @@ namespace DeployCmdlets4WA
             return false;
         }
 
-        private void Log(LogType type, string message)
-        { 
-            Console.WriteLine(string.Format("{0}: {1}", type.ToString(), string.IsNullOrEmpty(message) ? "<empty>" : message));
+        private static void Log(LogType type, string message)
+        {
+            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}: {1}", type.ToString(), string.IsNullOrEmpty(message) ? "<empty>" : message));
+        }
+    }
+
+    internal class NativeMethods
+    {
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+        internal static extern int SHGetKnownFolderPath([MarshalAs(UnmanagedType.LPStruct)] Guid rfid, uint dwFlags, IntPtr hToken, out string pszPath);
+
+        private NativeMethods()
+        {
         }
     }
 }

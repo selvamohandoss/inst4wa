@@ -10,7 +10,7 @@
     <Parameter Name="DomainName" Value="HelloWorldWebRole" Required="yes"></Parameter>
     <Parameter Name="StorageAccountName" ValuePrefixRef="DomainName" ValueSuffix="stg" Required="yes"></Parameter>
     <Parameter Name="DeploymentName" ValuePrefixRef="DomainName" ValueSuffix="deploy" Required="yes"></Parameter>
-    <Parameter Name="Region" Value="North Central US"></Parameter>
+    <Parameter Name="Location" Value="" Required="yes"></Parameter>
     <Parameter Name="DeploymentOption" Value="Production"></Parameter>
     <Parameter Name="PublishSettingsFilePath" Value="Azure.publishsettings"></Parameter>
     
@@ -42,8 +42,12 @@
     <Step Type="Cmdlet" Command="Add-LoadAssembly" Message="Loading Windows Azure PowerShell for Node.JS">
       <CommandParam Name="CmdletsAssemblyPath" ParameterName="AzureMgmtCmdletsAssemblyPath" />
     </Step>
+    
     <Step Type="Cmdlet" Command="Import-AzurePublishSettingsFile" Message="Importing Publish settings">
       <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />
+    </Step>
+    <Step Type="Cmdlet" Command="Set-AzureSubscription" Message="Configuring default Subscription">
+      <CommandParam Name="DefaultSubscription" ParameterName="Subscription"></CommandParam>
     </Step>
     
     <!--Create Empty App-->
@@ -66,18 +70,18 @@
     </Step>
 
     <!--Configure storage account and deploy-->
-    <Step Type="Cmdlet" Command="Set-AzureStorageAccount" Message="Configuring azure storage account">
+    <Step Type="Cmdlet" Command="Set-AzureStorageAccountEx" Message="Configuring azure storage account">
       <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />
       <CommandParam Name="Subscription" ParameterName="Subscription" />
       <CommandParam Name="StorageAccount" ParameterName="StorageAccountName" />
-      <CommandParam Name="Location" ParameterName="Region" />
+      <CommandParam Name="Location" ParameterName="Location" />
     </Step>
     
     <Step Type="Cmdlet" Command="Publish-AzureServiceProject -launch" Message="Deploying the app to Azure">
       <CommandParam Name="ServiceName" ParameterName="DeploymentName" />
       <CommandParam Name="StorageAccountName" ParameterName="StorageAccountName" />
       <CommandParam Name="Slot" ParameterName="DeploymentOption" />
-      <CommandParam Name="Location" ParameterName="Region" />
+      <CommandParam Name="Location" ParameterName="Location" />
       <CommandParam Name="Subscription" ParameterName="Subscription" />
     </Step>
     <Step Type="Cmdlet" Command="Ping-ServiceEndpoints" Message="Verifying the Endpoints.">

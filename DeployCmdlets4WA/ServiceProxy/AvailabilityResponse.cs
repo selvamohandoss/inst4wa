@@ -32,19 +32,6 @@ namespace DeployCmdlets4WA.ServiceProxy
     public class AvailabilityResponse
     {
         [DataMember(Order = 1, EmitDefaultValue = false)]
-        public string Result { get; set; }
-
-        [IgnoreDataMember]
-        public bool? IsAvailable
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(this.Result) == true)
-                {
-                    return null;
-                }
-                return this.Result == "true" ? true : false;
-            }
-        }
+        public bool Result { get; set; }
     }
 }

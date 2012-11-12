@@ -32,7 +32,7 @@ namespace DeployCmdlets4WA.Utilities
 {
     public delegate void Print(String message);
 
-    public class DownloadHelper
+    public class DownloadHelper : IDisposable
     {
         private AutoResetEvent threadBlocker;
         private int downloadProgress;
@@ -62,7 +62,11 @@ namespace DeployCmdlets4WA.Utilities
             }
             finally
             {
-                if (threadBlocker != null) { threadBlocker.Close(); }
+                if (threadBlocker != null) 
+                { 
+                    threadBlocker.Close(); 
+                    threadBlocker = null; 
+                }
             }
         }
 
@@ -86,8 +90,28 @@ namespace DeployCmdlets4WA.Utilities
                 isSuccessful = false;
                 error = e.Error;
             }
+
             Console.WriteLine();
             threadBlocker.Set();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // free managed resources
+                if (threadBlocker != null)
+                {
+                    threadBlocker.Close();
+                    threadBlocker = null;
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

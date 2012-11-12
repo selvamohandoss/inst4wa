@@ -3,10 +3,13 @@
   <Description>These are default test settings for a local test run.</Description>
   <Deployment>
     <DeploymentItem filename="Inst4WA.Test\TestData\WorkerRole\" outputDirectory="TestData\WorkerRole" />
+    <DeploymentItem filename="Inst4WA.Test\TestData\WebRole\" outputDirectory="TestData\WebRole" />
+    <DeploymentItem filename="DeployCmdlets4WA\Resources\imagelocations.xml" />
+    <DeploymentItem filename="DeployCmdlets4WA\Resources\remote-setup.ps1" />
+    <DeploymentItem filename="Inst4WA.Test\TestData\VMRole\" outputDirectory="TestData\VMRole\" />
+    <DeploymentItem filename="Inst4WA.Test\Inst4WaExe\Inst4WA.exe" />
     <DeploymentItem filename="Inst4WA.Test\TestCases\" outputDirectory="TestCases" />
     <DeploymentItem filename="Inst4WA.Test\Azure.publishsettings" />
-    <DeploymentItem filename="Inst4WA.Test\Inst4WaExe\Inst4WA.exe" />
-    <DeploymentItem filename="Inst4WA.Test\TestData\WebRole\" outputDirectory="TestData\WebRole" />
   </Deployment>
   <Execution>
     <TestTypeSpecific>

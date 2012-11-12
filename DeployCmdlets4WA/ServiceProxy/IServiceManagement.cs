@@ -53,6 +53,10 @@ namespace DeployCmdlets4WA.ServiceProxy
         StorageService GetStorageAccountKeys(string subscriptionId, string storageAccName);
 
         [OperationContract]
+        [WebGet(UriTemplate = @"{subscriptionId}/services/storageservices/{storageAccName}")]
+        StorageService GetStorageAccountProperties(string subscriptionId, string storageAccName);
+
+        [OperationContract]
         [WebGet(UriTemplate = @"{subscriptionId}/services/storageservices/operations/isavailable/{storageAccName}")]
         AvailabilityResponse CheckStorageAccountNameAvailability(string subscriptionId, string storageAccName);
 

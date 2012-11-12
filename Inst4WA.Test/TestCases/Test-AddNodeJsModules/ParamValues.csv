@@ -1,5 +1,5 @@
 Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative
-NodeJsDownloadLoc,http://nodejs.org/dist/v0.6.19/node-v0.6.19.msi,YES,,,FALSE
+NodeJsDownloadLoc,http://nodejs.org/dist/v0.8.14/x64/node-v0.8.14-x64.msi,YES,,,FALSE
 TestInstallNodeJsModulesLoc,C:\temp\NodeJsModules,YES,,,FALSE
 ModuleInstallLoc,C:\temp\NodeJsModules,YES,,,FALSE
 ModuleInstallLoc,C:\NonExistingPath,YES,,,TRUE

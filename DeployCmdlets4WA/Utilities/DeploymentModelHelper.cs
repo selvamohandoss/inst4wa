@@ -27,7 +27,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace DeployCmdlets4WA
+namespace DeployCmdlets4WA.Utilities
 {
     public class DeploymentModelHelper
     {
@@ -84,7 +84,11 @@ namespace DeployCmdlets4WA
         public bool IsForAzure()
         {
             string emulParam = this.GetParameterByName("Emulator");
-            return emulParam == "false";
+            if(emulParam == null)
+            {
+                return false;
+            }
+            return emulParam.Trim().ToUpperInvariant() == "FALSE";
         }
 
         public string Save()
@@ -98,14 +102,20 @@ namespace DeployCmdlets4WA
             return _xmlConfigPath;
         }
 
-        public IEnumerable<String> GetAllParameterNames() 
+        public IEnumerable<String> GetAllParameterNames 
         {
-            return _deploymentParams.Select(e => e.Name);
+            get
+            {
+                return _deploymentParams.Select(e => e.Name);
+            }
         }
 
-        public List<DeploymentModelParametersParameter> GetAllParameters()
+        public IEnumerable<DeploymentModelParametersParameter> AllParameters
         {
-            return _deploymentParams;
+            get
+            {
+                return _deploymentParams;
+            }
         }
 
         // the value of a param is either given directly as the Value attribute Or as a combination of the value of another parameter and a suffix. In that case, the name of the other
@@ -126,12 +136,15 @@ namespace DeployCmdlets4WA
                 return false;
 
             string value = paramEnum.Select(e => e.Required).FirstOrDefault();
-            return (string.Compare(value, "yes", true) == 0) || (string.Compare(value, "true", true) == 0) || (value == "1");
+            return (string.Compare(value, "yes", StringComparison.OrdinalIgnoreCase) == 0) || (string.Compare(value, "true", StringComparison.OrdinalIgnoreCase) == 0) || (value == "1");
         }
 
-        public List<DeploymentModelStepsStep> GetAllSteps()
+        public IEnumerable<DeploymentModelStepsStep> AllSteps
         {
-            return _steps;
+            get 
+            { 
+              return  _steps;
+            }
         }
 
         public DeploymentModelStepsStep GetStepAtIndex(int stepIndex) 
@@ -216,7 +229,7 @@ namespace DeployCmdlets4WA
             return true;
         }
 
-        public bool AddStep(string type, string command, string message, string[] commandParamStrings)
+        public bool AddStep(string type, string command, string message, string[] stepParams)
         {
             // creat step
             DeploymentModelStepsStep step = new DeploymentModelStepsStep();
@@ -227,11 +240,11 @@ namespace DeployCmdlets4WA
             // add command params to step
             List<DeploymentModelStepsStepCommandParam> commandParams = new List<DeploymentModelStepsStepCommandParam>();
 
-            for (int iString = 0; iString < commandParamStrings.Length; )
+            for (int iString = 0; iString < stepParams.Length; )
             {
                 DeploymentModelStepsStepCommandParam commandParam = new DeploymentModelStepsStepCommandParam();
-                commandParam.Name = commandParamStrings[iString++];
-                commandParam.ParameterName = commandParamStrings[iString++];
+                commandParam.Name = stepParams[iString++];
+                commandParam.ParameterName = stepParams[iString++];
                 commandParams.Add(commandParam);
             }
 

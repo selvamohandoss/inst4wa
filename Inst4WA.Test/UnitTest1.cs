@@ -31,6 +31,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Data.SqlServerCe;
 using System.Configuration;
+using DeployCmdlets4WA.Utilities;
+using System.Security.Permissions;
 
 namespace Inst4WA.Test
 {
@@ -64,7 +66,7 @@ namespace Inst4WA.Test
                     ModelHelperInfo modelHelperInfo = modelHelperInfos[iModel];
                     ModelHelperInfo modelHelperInfoCopy = ModelHelperInfo.Create(directory);
 
-                    foreach (DeploymentModelStepsStep step in modelHelperInfo.modelHelper.GetAllSteps())
+                    foreach (DeploymentModelStepsStep step in modelHelperInfo.modelHelper.AllSteps)
                     {
                         List<string> commandParamStrings = new List<string>();
                         for (int iCommandParam = 0; iCommandParam < step.CommandParam.Length; iCommandParam++)
@@ -76,7 +78,7 @@ namespace Inst4WA.Test
                         modelHelperInfoCopy.modelHelper.AddStep(step.Type, step.Command, step.Message, commandParamStrings.ToArray());
                     }
 
-                    IEnumerable<DeploymentModelParametersParameter> dmParams = modelHelperInfo.modelHelper.GetAllParameters();
+                    IEnumerable<DeploymentModelParametersParameter> dmParams = modelHelperInfo.modelHelper.AllParameters;
                     foreach (DeploymentModelParametersParameter dmParam in dmParams)
                     {
                         modelHelperInfoCopy.modelHelper.AddParameter(dmParam.Name, dmParam.Value, dmParam.Required, dmParam.ValuePrefixRef, dmParam.ValueSuffix);
@@ -92,6 +94,7 @@ namespace Inst4WA.Test
     {
         public DeploymentModelParametersParameter dmParam;
         public bool isNegativeTestCase;
+        public bool isUnbound;
     }
 
     public class StepInfo
@@ -125,6 +128,7 @@ namespace Inst4WA.Test
         private bool _testFailed;
         private string _errorMsg;
 
+
         private TestContext _testContextInstance;
         public TestContext TestContext
         {
@@ -141,7 +145,7 @@ namespace Inst4WA.Test
             CreateTestCaseDB();
 
             string testCaseDirs = ConfigurationManager.AppSettings["TestCaseDirs"];
-            
+
             if (!string.IsNullOrEmpty(testCaseDirs))
             {
                 string[] matchingDirs = null;
@@ -176,7 +180,7 @@ namespace Inst4WA.Test
 
             // save hand-generated test cases to DB
             string staticTestCaseFiles = ConfigurationManager.AppSettings["StaticTestCaseFiles"];
-            
+
             if (!string.IsNullOrEmpty(staticTestCaseFiles))
             {
                 IEnumerable<string> files;
@@ -284,6 +288,8 @@ namespace Inst4WA.Test
 
         [DataSource(@"XMLConfigsDataSource")]
         [TestMethod]
+        [Timeout(1800000)]
+        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
         public void AllConfigXMLTestCases()
         {
             string xmlConfigPath = _testContextInstance.DataRow["XMLConfigPath"].ToString();
@@ -384,7 +390,7 @@ namespace Inst4WA.Test
             modelHelperInfos.Add(mhi);
 
             // for each step in model
-            List<DeploymentModelStepsStep> steps = mhi.modelHelper.GetAllSteps();
+            List<DeploymentModelStepsStep> steps = mhi.modelHelper.AllSteps.ToList();
             for (int iStep = 0; iStep < steps.Count; iStep++)
             {
                 // for each commandParam in step
@@ -414,6 +420,17 @@ namespace Inst4WA.Test
                 }
             }
 
+            List<ParamInfo> unboundParams = _paramInfos.Where(e => e.isUnbound == true).ToList();
+            if (unboundParams != null && unboundParams.Count() != 0)
+            {
+                foreach (ModelHelperInfo eachModelHelperInfo in modelHelperInfos)
+                {
+                    foreach (ParamInfo eachUnboundParam in unboundParams)
+                    {
+                        eachModelHelperInfo.modelHelper.AddParameter(eachUnboundParam.dmParam);
+                    }
+                }
+            }
             return modelHelperInfos;
         }
 
@@ -432,7 +449,7 @@ namespace Inst4WA.Test
             if (bEmulator)
                 p.StartInfo.Arguments = string.Format("-XmlConfigPath \"{0}\"", xmlConfigPath);
             else
-                p.StartInfo.Arguments = string.Format("-XmlConfigPath \"{0}\" -Subscription \"{1}\" -DomainName \"{2}\"", 
+                p.StartInfo.Arguments = string.Format("-XmlConfigPath \"{0}\" -Subscription \"{1}\" -DomainName \"{2}\"",
                     xmlConfigPath, ConfigurationManager.AppSettings["Subscription"], ConfigurationManager.AppSettings["DomainName"]);
 
             p.StartInfo.UseShellExecute = false;
@@ -557,7 +574,14 @@ namespace Inst4WA.Test
                 ParamInfo paramInfo = new ParamInfo();
                 paramInfo.dmParam = dmParam;
                 paramInfo.isNegativeTestCase = !string.IsNullOrEmpty(paramValuesSplitLine[5]) && (paramValuesSplitLine[5].ToLower() == "true");
-
+                if (paramValuesSplitLine.Length >= 7)
+                {
+                    paramInfo.isUnbound = !string.IsNullOrEmpty(paramValuesSplitLine[6]) && (paramValuesSplitLine[6].ToLower() == "true");
+                }
+                else
+                {
+                    paramInfo.isUnbound = false;
+                }
                 return paramInfo;
             }
             ).ToList<ParamInfo>();

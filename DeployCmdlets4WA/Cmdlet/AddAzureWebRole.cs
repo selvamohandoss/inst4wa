@@ -30,6 +30,7 @@ using System.IO;
 using DeployCmdlets4WA.Properties;
 using DeployCmdlets4WA.Utilities;
 using DeployCmdlets4WA.Cmdlet.ServiceConfigurationSchema;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
@@ -42,11 +43,11 @@ namespace DeployCmdlets4WA.Cmdlet
 
         [Parameter(Mandatory = true, HelpMessage = "Location of CSCFG file containing role configuration.")]
         [ValidateNotNullOrEmpty]
-        public string CSCFGFile { get; set; }
+        public string CscfgFile { get; set; }
 
         [Parameter(Mandatory = true, HelpMessage = "Location of CSDEF file containing role definition.")]
         [ValidateNotNullOrEmpty]
-        public string CSDEFFile { get; set; }
+        public string CsdefFile { get; set; }
 
         [Parameter(Mandatory = true, HelpMessage = "Name of the web role.")]
         [ValidateNotNullOrEmpty]
@@ -64,7 +65,7 @@ namespace DeployCmdlets4WA.Cmdlet
             base.ProcessRecord();
 
             //Step 1 - Validate Params.
-            ValidateInputs();
+            ValidateInputs(this.RoleBinariesFolder, this.CscfgFile, this.CsdefFile);
 
             //Step 2 - Copy CSCFG and CSDEF Settings.
             UpdateCSCFG();
@@ -74,23 +75,23 @@ namespace DeployCmdlets4WA.Cmdlet
             CopyBinaries();
         }
 
-        private void ValidateInputs()
+        private void ValidateInputs(string roleBinariesFolder, string cscfgFile, string csdefFile)
         {
-            if (Directory.Exists(this.RoleBinariesFolder) == false)
+            if (Directory.Exists(roleBinariesFolder) == false)
             {
-                throw new ArgumentException(Resources.InvalidRoleBinaryFolder, "RoleBinariesFolder");
+                throw new ArgumentException(Resources.InvalidRoleBinaryFolder, "roleBinariesFolder");
             }
-            if (File.Exists(this.CSCFGFile) == false)
+            if (File.Exists(cscfgFile) == false)
             {
-                throw new ArgumentException(Resources.CSCFGFileDoesNotExist, "CSCFGFile");
+                throw new ArgumentException(Resources.CSCFGFileDoesNotExist, "cscfgFile");
             }
-            if (File.Exists(this.CSDEFFile) == false)
+            if (File.Exists(csdefFile) == false)
             {
-                throw new ArgumentException(Resources.CSDEFFileDoesNotExist, "CSDEFFile");
+                throw new ArgumentException(Resources.CSDEFFileDoesNotExist, "csdefFile");
             }
             if (File.Exists(LocalCSCFGFile) == false || File.Exists(CloudCSCFGFile) == false || File.Exists(ServiceCSDEFFile) == false)
             {
-                throw new Exception(Resources.ServiceRootInvalid);
+                throw new ArgumentException(Resources.ServiceRootInvalid);
             }
         }
 
@@ -99,50 +100,50 @@ namespace DeployCmdlets4WA.Cmdlet
             string roleDir = Path.Combine(CurrentLocation, this.RoleName);
             if (Directory.Exists(roleDir) == true)
             {
-                WriteObject(string.Format(Resources.RoleDirAlreadyPresent, this.RoleName));
+                WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.RoleDirAlreadyPresent, this.RoleName));
             }
             else
             {
                 Directory.CreateDirectory(roleDir);
-                ExecuteCommands.ExecuteCommand(string.Format("COPY-ITEM \"{0}\" \"{1}\" -recurse", Path.Combine(this.RoleBinariesFolder, "*"), roleDir), this.Host);
+                ExecuteCommands.ExecuteCommand(string.Format(CultureInfo.InvariantCulture, "COPY-ITEM \"{0}\" \"{1}\" -recurse", Path.Combine(this.RoleBinariesFolder, "*"), roleDir), this.Host);
             }
         }
 
         private void UpdateCSDEF()
         {
-            string loweredRoleName = this.RoleName.ToLowerInvariant();
+            string normalizedRoleName = this.RoleName.ToUpperInvariant();
 
             ServiceDefinitionSchema.ServiceDefinition destCSDEF = SerializationUtils.DeserializeXmlFile<ServiceDefinitionSchema.ServiceDefinition>(ServiceCSDEFFile);
 
             if (destCSDEF.WebRole != null)
             {
                 //Check if destination csdef already has a role.
-                ServiceDefinitionSchema.WebRole roleToAddInDestCSDEF = destCSDEF.WebRole.Where(eachRole => eachRole.name.ToLowerInvariant() == loweredRoleName).FirstOrDefault();
+                ServiceDefinitionSchema.WebRole roleToAddInDestCSDEF = destCSDEF.WebRole.Where(eachRole => eachRole.name.ToUpperInvariant() == normalizedRoleName).FirstOrDefault();
                 //If found just update VMSize and exit.
                 if (roleToAddInDestCSDEF != null)
                 {
                     roleToAddInDestCSDEF.vmsize = this.VMSize == null ? roleToAddInDestCSDEF.vmsize : this.VMSize.Value;
                     SerializationUtils.SerializeXmlFile<ServiceDefinitionSchema.ServiceDefinition>(destCSDEF, ServiceCSDEFFile);
-                    WriteObject(string.Format(Resources.RoleAlreadyPresentInCSDEF, this.RoleName, roleToAddInDestCSDEF.vmsize.ToString()));
+                    WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.RoleAlreadyPresentInCSDEF, this.RoleName, roleToAddInDestCSDEF.vmsize.ToString()));
                     return;
                 }
             }
             
-            ServiceDefinitionSchema.ServiceDefinition sourceCSDEF = SerializationUtils.DeserializeXmlFile<ServiceDefinitionSchema.ServiceDefinition>(CSDEFFile);
+            ServiceDefinitionSchema.ServiceDefinition sourceCSDEF = SerializationUtils.DeserializeXmlFile<ServiceDefinitionSchema.ServiceDefinition>(CsdefFile);
             if (sourceCSDEF.WebRole == null)
             {
-                throw new ArgumentException(string.Format(Resources.RoleNotFoundInCSDEF, this.RoleName), "RoleName");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.RoleNotFoundInCSDEF, this.RoleName));
             }
 
-            ServiceDefinitionSchema.WebRole roleToAdd = sourceCSDEF.WebRole.Where(eachRole => eachRole.name.ToLowerInvariant() == loweredRoleName).FirstOrDefault();
+            ServiceDefinitionSchema.WebRole roleToAdd = sourceCSDEF.WebRole.Where(eachRole => eachRole.name.ToUpperInvariant() == normalizedRoleName).FirstOrDefault();
             if (roleToAdd == null)
             {
-                throw new ArgumentException(string.Format(Resources.RoleNotFoundInCSDEF, this.RoleName), "RoleName");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.RoleNotFoundInCSDEF, this.RoleName));
             }
 
             if (roleToAdd.Runtime == null || roleToAdd.Runtime.EntryPoint == null)
             {
-                throw new Exception(string.Format(Resources.EntryPointConfigMissing, this.RoleName));
+                throw new ApplicationFailedException(string.Format(CultureInfo.InvariantCulture, Resources.EntryPointConfigMissing, this.RoleName));
             }
 
             List<ServiceDefinitionSchema.WebRole> webRoles = new List<ServiceDefinitionSchema.WebRole>();
@@ -159,18 +160,18 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private void UpdateCSCFG()
         {
-            string loweredRoleName = this.RoleName.ToLowerInvariant();
+            string normalizedRoleName = this.RoleName.ToUpperInvariant();
 
-            ServiceConfigurationSchema.ServiceConfiguration sourceCSCFG = SerializationUtils.DeserializeXmlFile<ServiceConfigurationSchema.ServiceConfiguration>(CSCFGFile);
+            ServiceConfigurationSchema.ServiceConfiguration sourceCSCFG = SerializationUtils.DeserializeXmlFile<ServiceConfigurationSchema.ServiceConfiguration>(CscfgFile);
             if (sourceCSCFG.Role == null)
             {
-                throw new ArgumentException(string.Format(Resources.RoleNotFoundInCSCFG, this.RoleName), "RoleName");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.RoleNotFoundInCSCFG, this.RoleName));
             }
 
-            ServiceConfigurationSchema.RoleSettings roleToAdd = sourceCSCFG.Role.Where(eachRole => eachRole.name.ToLowerInvariant() == loweredRoleName).FirstOrDefault();
+            ServiceConfigurationSchema.RoleSettings roleToAdd = sourceCSCFG.Role.Where(eachRole => eachRole.name.ToUpperInvariant() == normalizedRoleName).FirstOrDefault();
             if (roleToAdd == null)
             {
-                throw new ArgumentException(string.Format(Resources.RoleNotFoundInCSCFG, this.RoleName), "RoleName");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.RoleNotFoundInCSCFG, this.RoleName));
             }
 
             ConfigureInstCount(roleToAdd);
@@ -192,16 +193,16 @@ namespace DeployCmdlets4WA.Cmdlet
         {
             ServiceConfigurationSchema.ServiceConfiguration config = SerializationUtils.DeserializeXmlFile<ServiceConfigurationSchema.ServiceConfiguration>(cscfgFileLoc);
 
-            string roleNameToAdd = roleToAdd.name.ToLowerInvariant();
+            string roleNameToAdd = roleToAdd.name.ToUpperInvariant();
             if (config.Role != null)
             {
                 //Check if role to be added is already present inside the cscfg. If so just update instance count.
-                RoleSettings matchingRoleInConfig = config.Role.Where(eachRole => eachRole.name.ToLowerInvariant() == roleNameToAdd).FirstOrDefault();
+                RoleSettings matchingRoleInConfig = config.Role.Where(eachRole => eachRole.name.ToUpperInvariant() == roleNameToAdd).FirstOrDefault();
                 if (matchingRoleInConfig != null)
                 {
                     ConfigureInstCount(matchingRoleInConfig);
                     SerializationUtils.SerializeXmlFile<ServiceConfigurationSchema.ServiceConfiguration>(config, cscfgFileLoc);
-                    WriteObject(string.Format(Resources.RoleAlreadyPresentInCSCFG, roleNameToAdd, matchingRoleInConfig.Instances.count.ToString()));
+                    WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.RoleAlreadyPresentInCSCFG, roleNameToAdd, matchingRoleInConfig.Instances.count.ToString(CultureInfo.InvariantCulture)));
                     return;
                 }
             }

@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
+[Serializable]
 public class CsvParseException : Exception
 {
     public CsvParseException(string message)

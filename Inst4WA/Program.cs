@@ -29,6 +29,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Xml;
 using System.IO;
+using Microsoft.Win32;
 
 namespace Inst4WA
 {
@@ -107,6 +108,16 @@ namespace Inst4WA
 
         private static void EnsureCorrectPowershellConfig()
         {
+            int psVersion = GetPowershellVersion();
+
+            if ((psVersion <= 0) || (psVersion > 3))
+            {
+                throw new Exception("Unsupported powershell version.");
+            }
+
+            if (psVersion == 3) // no config needed for PS 3.0
+                return;
+
             List<string> locationOfPowershellExe = GetPowershellLocation();
             if (locationOfPowershellExe == null || locationOfPowershellExe.Count == 0)
             {
@@ -131,8 +142,18 @@ namespace Inst4WA
 
                 //Prepate config file.
                 PrepareConfigFile(configFileLoc);
-
             }
+        }
+
+        private static int GetPowershellVersion()
+        {
+            if ((string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine", "PowerShellVersion", null) == "3.0")
+                return 3;
+            
+            if ((string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\PowerShellEngine", "PowerShellVersion", null) == "2.0")
+                return 2;
+
+            return -1;
         }
 
         private static void PrepareConfigFile(string configFileLoc)

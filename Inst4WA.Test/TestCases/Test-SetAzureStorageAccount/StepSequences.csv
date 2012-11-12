@@ -1,0 +1,2 @@
+Command,Command,Command,Command,Command,Command,Command,Command,Command
+Cmdlet:Add-LoadAssembly.1,Cmdlet:Add-LoadAssembly.2,Cmdlet:New-ApplicationDirectory,ChangeWorkingDir:,Cmdlet:Import-AzurePublishSettingsFile,Cmdlet:Set-AzureSubscription,Cmdlet:New-AzureServiceProject,Cmdlet:Add-AzureWebRole,Cmdlet:Set-AzureStorageAccountEx

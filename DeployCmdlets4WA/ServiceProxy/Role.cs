@@ -29,6 +29,7 @@ using System.Runtime.Serialization;
 namespace DeployCmdlets4WA.ServiceProxy
 {
     [DataContract(Name = "Role", Namespace = "http://schemas.microsoft.com/windowsazure")]
+    [KnownType(typeof(PersistentVMRole))]
     public class Role
     {
         [DataMember(Order = 1)]

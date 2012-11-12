@@ -29,6 +29,8 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "HelloWorld.WorkerRole", "He
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inst4WA", "Inst4WA\Inst4WA.csproj", "{214B35AA-FD66-45EE-80CF-7D18203FABCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorld.VMRole", "HelloWorld\HelloWorld.VMRole\HelloWorld.VMRole.csproj", "{D1490092-D9AB-45EF-9547-D739133C1901}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Inst4WA.vsmdi
@@ -116,6 +118,16 @@ Global
 		{214B35AA-FD66-45EE-80CF-7D18203FABCD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{214B35AA-FD66-45EE-80CF-7D18203FABCD}.Release|x86.ActiveCfg = Release|x86
 		{214B35AA-FD66-45EE-80CF-7D18203FABCD}.Release|x86.Build.0 = Release|x86
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D1490092-D9AB-45EF-9547-D739133C1901}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

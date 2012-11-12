@@ -28,6 +28,7 @@ using System.Management.Automation;
 using System.Collections.ObjectModel;
 using System.Management.Automation.Host;
 using System.Management.Automation.Runspaces;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Utilities
 {
@@ -53,7 +54,6 @@ namespace DeployCmdlets4WA.Utilities
                     ps.AddScript(command);
 
                     // Create the output buffer for the results.
-                    PSDataCollection<PSObject> output = new PSDataCollection<PSObject>();
                     IAsyncResult async = ps.BeginInvoke();
                     foreach (PSObject result in ps.EndInvoke(async))
                     {
@@ -82,7 +82,7 @@ namespace DeployCmdlets4WA.Utilities
             }
             if(record.ErrorDetails != null)
             {
-                return String.Format("Erro - {0} & Recommended action - {1}", record.ErrorDetails.Message, record.ErrorDetails.RecommendedAction);
+                return String.Format(CultureInfo.InvariantCulture, "Erro - {0} & Recommended action - {1}", record.ErrorDetails.Message, record.ErrorDetails.RecommendedAction);
             }
             return record.ToString();
         }

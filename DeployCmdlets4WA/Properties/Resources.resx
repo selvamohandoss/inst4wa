@@ -228,9 +228,6 @@
   <data name="VerifyStorageAccCount" xml:space="preserve">
     <value>Verifying if Storage account count exceeded.</value>
   </data>
-  <data name="WebPICmdlineURL" xml:space="preserve">
-    <value>http://go.microsoft.com/fwlink/?LinkId=233753</value>
-  </data>
   <data name="WinServiceAlreadyStopped" xml:space="preserve">
     <value>Windows service '{0}' is already stopped.</value>
   </data>
@@ -242,5 +239,181 @@
   </data>
   <data name="StorageAccLimitReached" xml:space="preserve">
     <value>You have already created the maximum number of storage accounts.</value>
+  </data>
+  <data name="ConfigJson" xml:space="preserve">
+    <value>[
+    {{
+        "SSH": [
+            {{
+                "info": {{
+                    "host": "{0}",
+                    "user": "{1}",
+                    "password": "{2}",
+                    "ports": [
+                        {3}
+                    ]
+                }}
+            }}
+        ]
+    }},
+    {{
+        "VMS": [
+           {{
+                "info": {{
+                    "ips": [
+                        {4}
+                    ]
+                }}
+            }}
+        ]
+    }},
+    {{
+        "DNS": [
+            {{
+                "info": {{
+                    "name": "{5}"
+                }}
+            }}
+        ]
+    }}
+]</value>
+  </data>
+  <data name="LocationXmlNotFound" xml:space="preserve">
+    <value>File '{0}' does not exists.</value>
+  </data>
+  <data name="CopyingVHD" xml:space="preserve">
+    <value>Copying VHD from '{0}' to '{1}'.</value>
+  </data>
+  <data name="CreatingContainerIfNotExists" xml:space="preserve">
+    <value>Creating container '{0}' if it does not exists.</value>
+  </data>
+  <data name="CreatingVMImage" xml:space="preserve">
+    <value>Creating VM image '{0}'.</value>
+  </data>
+  <data name="FetchingStorageAccKeys" xml:space="preserve">
+    <value>Fetching storage account keys for '{0}'.</value>
+  </data>
+  <data name="ImgUrlNotFoundForLocation" xml:space="preserve">
+    <value>VHD ImageUrl for location '{0}' not found.</value>
+  </data>
+  <data name="ConfigWinRMAuth" xml:space="preserve">
+    <value>Configuring WinRM Auth.</value>
+  </data>
+  <data name="ConfigWinRMEnc" xml:space="preserve">
+    <value>Configuring WinRM Encrypt.</value>
+  </data>
+  <data name="ConfigWinRMTrustedHost" xml:space="preserve">
+    <value>Configuring WinRM trusted host.</value>
+  </data>
+  <data name="EnablingWinRM" xml:space="preserve">
+    <value>Enabling WinRM service on your machine.</value>
+  </data>
+  <data name="ErrorConfigWinRM" xml:space="preserve">
+    <value>Error setting WinRM config.</value>
+  </data>
+  <data name="ErrorEnablingWinRM" xml:space="preserve">
+    <value>Error occured while enabling WinRM on local machine.</value>
+  </data>
+  <data name="ErrorSettingDefaultStorageAcc" xml:space="preserve">
+    <value>Error setting default storage account.</value>
+  </data>
+  <data name="SetDefaultStorageAcc" xml:space="preserve">
+    <value>Setting '{0}' as default storage acocunt for subscription '{1}'.</value>
+  </data>
+  <data name="UpdateRegistryForWinRM" xml:space="preserve">
+    <value>Change the Remote UAC LocalAccountTokenFilterPolicy registry setting.</value>
+  </data>
+  <data name="AzureDiskDeleted" xml:space="preserve">
+    <value>Azure disk '{0}' deleted.</value>
+  </data>
+  <data name="CreatingService" xml:space="preserve">
+    <value>Creating service '{0}'.</value>
+  </data>
+  <data name="DeletingAzureDisk" xml:space="preserve">
+    <value>Deleting Azure disk '{0}'.</value>
+  </data>
+  <data name="DeletingVM" xml:space="preserve">
+    <value>Deleting VM '{0}'.</value>
+  </data>
+  <data name="ErrorCreatingService" xml:space="preserve">
+    <value>Error creating new service with name '{0}'.</value>
+  </data>
+  <data name="ErrorDeletingAzureDisk" xml:space="preserve">
+    <value>Erorr deleting Azure disk '{0}'.'</value>
+  </data>
+  <data name="ErrorDeletingVM" xml:space="preserve">
+    <value>Error deleting VM '{0}'.</value>
+  </data>
+  <data name="ErrorFetchingExistingVMs" xml:space="preserve">
+    <value>Error fetching list of existing VMs in service '{0}'.</value>
+  </data>
+  <data name="ErrorFetchingOSDiskForVM" xml:space="preserve">
+    <value>Error fetching OS disk details for VM '{0}'.</value>
+  </data>
+  <data name="ErrorVerifyingIfServiceExist" xml:space="preserve">
+    <value>Error verifying if service exists.</value>
+  </data>
+  <data name="FetchigOSDiskForVM" xml:space="preserve">
+    <value>Fetching OS disk details for VM '{0}'.</value>
+  </data>
+  <data name="FetchingExistingVMs" xml:space="preserve">
+    <value>Fetching existing VMs in service '{0}'.</value>
+  </data>
+  <data name="OSDiskNameForVM" xml:space="preserve">
+    <value>OS Disk name for VM '{0}' is '{1}'.</value>
+  </data>
+  <data name="ServiceExists" xml:space="preserve">
+    <value>Service with name '{0}' already exists. Hence VM's shall be added to same service.</value>
+  </data>
+  <data name="VerifyIfServiceExist" xml:space="preserve">
+    <value>Verifying if service with name '{0}' already exists.</value>
+  </data>
+  <data name="VMAlreadyExists" xml:space="preserve">
+    <value>VM '{0}' already exists.</value>
+  </data>
+  <data name="VMDeletionSuccess" xml:space="preserve">
+    <value>VM '{0}' deleted.</value>
+  </data>
+  <data name="VMCountInvalid" xml:space="preserve">
+    <value>VM count should be greater than zero.</value>
+  </data>
+  <data name="ErrorVerifyingVMImageExists" xml:space="preserve">
+    <value>Error occured while trying check if VM image already exists.</value>
+  </data>
+  <data name="VerifyingVMImageExists" xml:space="preserve">
+    <value>Checking if VM image "{0}" already exists.</value>
+  </data>
+  <data name="VMImageCreationFailed" xml:space="preserve">
+    <value>Attempt to create Windows image with WinRM enabled failed.</value>
+  </data>
+  <data name="VMImagePropHeader" xml:space="preserve">
+    <value>VM image properties:</value>
+  </data>
+  <data name="StorageAccDiffLocationWarning" xml:space="preserve">
+    <value>The values you have specified for the Location and StorageAccount parameters will result in your service and storage account being created in a different geographical regions, resulting in lower performance and higher costs for you. Please consider adjusting the values</value>
+  </data>
+  <data name="StorageAccExistsForDiffSubscription" xml:space="preserve">
+    <value>Storage account '{0}' belongs to different subscription.</value>
+  </data>
+  <data name="WarnAzureVMDeleteError" xml:space="preserve">
+    <value>Error deleting VM '{0}'. System shall retry after '{1}' seconds.</value>
+  </data>
+  <data name="ForceParamInvalid" xml:space="preserve">
+    <value>Invalid value for Force parameter. Right values are True or False.</value>
+  </data>
+  <data name="WarnAzureVMCreationFailed" xml:space="preserve">
+    <value>Error creating VM '{0}'. System shall retry after '{1}' seconds.</value>
+  </data>
+  <data name="InvalidVMName" xml:space="preserve">
+    <value>VM name '{0}' is invalid. The VM name may not be more than 15 characters long, may not be entirely numeric, and may not contain the following characters: ~ ! @ # $ % ^ &amp; * ( ) = + _ [ ] {{}} \ | ; : . ' " , &lt; / ?.</value>
+  </data>
+  <data name="ErrorInstallingWebPI" xml:space="preserve">
+    <value>Error installing WebPI. Unable to locate WebPICmdline.exe at '{0}'.</value>
+  </data>
+  <data name="VerifyingWebPIInstallation" xml:space="preserve">
+    <value>Verifying if WebPI installation.</value>
+  </data>
+  <data name="WebPIDownloadLoc" xml:space="preserve">
+    <value>http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi</value>
   </data>
 </root>

@@ -32,10 +32,11 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.StorageClient;
 using System.Net.Sockets;
 using System.IO;
+using System.Globalization;
 
 namespace WorkerRole
 {
-    public class WorkerRole : RoleEntryPoint
+    public class HelloWorldWorkerRole : RoleEntryPoint
     {
         public override void Run()
         {
@@ -44,7 +45,7 @@ namespace WorkerRole
             HttpListener listener = new HttpListener();
 
             IPEndPoint inputEndPoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["HelloWorldEndpoint"].IPEndpoint;
-            string listenerPrefix = string.Format("http://{0}:{1}/", inputEndPoint.Address, inputEndPoint.Port);
+            string listenerPrefix = string.Format(CultureInfo.InvariantCulture, "http://{0}:{1}/", inputEndPoint.Address, inputEndPoint.Port);
 
             Trace.WriteLine("Listening to -" + listenerPrefix);
 

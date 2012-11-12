@@ -64,5 +64,13 @@ setlocal
 
 	COPY /Y %inst4WaExeSrcDir% %inst4WaExeDir% 
 
+	set vmRoleSrcBin=%solutionDir%HelloWorld\HelloWorld.VMRole\bin\%config%
+	set vmRoleDestDir=%testDataDir%VMRole
+
+	IF EXIST %vmRoleDestDir% RMDIR /S/Q %vmRoleDestDir%
+	mkdir %vmRoleDestDir%
+
+	XCOPY /Y/I/Q/S %vmRoleSrcBin%\*.ps1 %vmRoleDestDir%
+
 endlocal
 GOTO:EOF

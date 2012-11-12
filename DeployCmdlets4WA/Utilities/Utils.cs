@@ -29,6 +29,7 @@ using System.IO;
 using Microsoft.WindowsAzure.Management.XmlSchema;
 using System.Security.Cryptography.X509Certificates;
 using DeployCmdlets4WA.Properties;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Utilities
 {
@@ -59,7 +60,7 @@ namespace DeployCmdlets4WA.Utilities
                 }
             }
 
-            throw new ArgumentException(string.Format(Resources.SubscriptionNotFound, subscriptionName), "Subscription");
+            throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.SubscriptionNotFound, subscriptionName), "subscriptionName");
         }
     }
 

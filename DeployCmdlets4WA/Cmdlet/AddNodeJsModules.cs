@@ -29,11 +29,12 @@ using System.IO;
 using System.Reflection;
 using System.Collections.ObjectModel;
 using DeployCmdlets4WA.Properties;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
     [Cmdlet(VerbsLifecycle.Install, "NodeJsModules")]
-    public class AddNodeJsModules : PSCmdlet
+    public class AddNodeJSModules : PSCmdlet
     {
         [Parameter(Mandatory = true, HelpMessage = "Location to install node modules.")]
         [ValidateNotNullOrEmpty]
@@ -45,7 +46,7 @@ namespace DeployCmdlets4WA.Cmdlet
 
         protected override void ProcessRecord()
         {
-            PreValidate();
+            PreValidate(this.InstallLoc);
 
             base.ProcessRecord();
 
@@ -54,12 +55,12 @@ namespace DeployCmdlets4WA.Cmdlet
 
             PostValidate();
         }
-        
-        private void PreValidate()
+
+        private static void PreValidate(string installLoc)
         {
-            if (Directory.Exists(this.InstallLoc) == false)
+            if (Directory.Exists(installLoc) == false)
             {
-                throw new ArgumentException(string.Format(Resources.InvalidInstallLoc, this.InstallLoc), "InstallLoc");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.InvalidInstallLoc, installLoc), "installLoc");
             }
         }
 
@@ -79,11 +80,11 @@ namespace DeployCmdlets4WA.Cmdlet
             }
             if (string.IsNullOrEmpty(errorModules) == false)
             {
-                throw new Exception(string.Format(Resources.ErrorInstallingModules, errorModules));
+                throw new ApplicationFailedException(string.Format(CultureInfo.InvariantCulture, Resources.ErrorInstallingModules, errorModules));
             }
         }
 
-        private string GetInstallScript()
+        private static string GetInstallScript()
         {
             string installScript = null;
             using (Stream ps1Stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("DeployCmdlets4WA.Resources.InstallNodeJSModules.ps1"))

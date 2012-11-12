@@ -30,15 +30,15 @@ using System.Threading;
 using System.IO;
 using DeployCmdlets4WA.Utilities;
 using DeployCmdlets4WA.Properties;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
     [Cmdlet("Install", "AzureSdkForNodeJs")]
-    public class InstallAzureSdkForNodeJs : PSCmdlet
+    public class InstallAzureSdkForNodeJS : PSCmdlet
     {
-        private AutoResetEvent threadBlocker;
-
-        private int downloadProgress;
+        private const string webPiProgLoc = @"\Program Files\Microsoft\Web Platform Installer\WebpiCmd.exe";
+        private const string webPiProgx86Loc = @"\Program Files (x86)\Microsoft\Web Platform Installer\WebpiCmd.exe";
 
         [Parameter(Mandatory = true, HelpMessage = "Specify the location where Azure node sdk is installed.")]
         public string AzureNodeSdkLoc { get; set; }
@@ -47,91 +47,60 @@ namespace DeployCmdlets4WA.Cmdlet
         {
             base.ProcessRecord();
 
-            //Download the WebPI Commandline
-            String downloadLocation = DownloadWebPICmdLine();
+            //Download the WebPI.
+            String downloadLocation = DownloadWebPI();
 
-            //Unzip it.
-            String unzipLocation = Unzip(downloadLocation);
+            //Install it.
+            String pathToWebPIExe = InstallWebPI(downloadLocation);
 
-            //Fire command to install NodeJs
-            String logFileName = Install(unzipLocation);
+            //Fire command to install NodeJs.
+            String logFileName = InstallAzurePowershell(pathToWebPIExe);
 
             //Verify if installation was successful.
             if (WasInstallationSuccessful() == false)
             {
                 Console.WriteLine(File.ReadAllText(logFileName));
-                throw new Exception("Installtion of Windows Azure SDK for node.js failed. Please try installing the SDK separately and retry.");
+                throw new ApplicationFailedException("Installtion of Windows Azure SDK for node.js failed. Please try installing the SDK separately and retry.");
             }
         }
 
-        private string Install(string unzipLocation)
+        private string InstallAzurePowershell(string pathToWebPIExe)
         {
             // .\WebpiCmdLine.exe /Products:AzureNodePowershell
             String logFileName = String.Concat("WebPiLog_", Guid.NewGuid().ToString(), ".txt");
             FileStream logFileFs = File.Create(logFileName);
             logFileFs.Close();
 
-            String pathToWebPIExe = Path.Combine(unzipLocation, "WebpiCmd.exe");
-            String installCommand = String.Format("Start-Process -File \"{0}\" -ArgumentList \" /Install /Products:AzureNodeSDK /Log:{1} /AcceptEULA \" -Wait", pathToWebPIExe, logFileName);
+            String installCommand = String.Format(CultureInfo.InvariantCulture, "Start-Process -File \"{0}\" -ArgumentList \" /Install /Products:AzureNodeSDK,AzureNodePowershell /Log:{1} /AcceptEULA \" -Wait", pathToWebPIExe, logFileName);
             ExecuteCommands.ExecuteCommand(installCommand, this.Host);
             return logFileName;
         }
 
-        private string Unzip(string downloadLocation)
+        private string InstallWebPI(string downloadLocation)
         {
-            String unzipLocation = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(unzipLocation);
-            String unzipCommand = String.Format(@"function Unzip([string]$locationOfZipFile, [string]$unzipLocation)
-                                                {{
-                                                    Write-Host $locationOfZipFile
-                                                    Write-Host $unzipLocation
-                                                    $shell_app = new-object -com shell.application
-                                                    $zip_file = $shell_app.namespace($locationOfZipFile)
-                                                    $destination = $shell_app.namespace($unzipLocation)
-                                                    $destination.Copyhere($zip_file.items())
-                                                }}
-                                                Unzip ""{0}""  ""{1}""
-                                                ", downloadLocation, unzipLocation);
-            ExecuteCommands.ExecuteCommand(unzipCommand, this.Host);
-            return unzipLocation;
+            String installCmd = String.Format(CultureInfo.InvariantCulture, "Start-Process -File msiexec.exe -ArgumentList /qn, /i, \"{0}\" -Wait", downloadLocation);
+            Utilities.ExecuteCommands.ExecuteCommand(installCmd, this.Host);
+
+            WriteObject(Resources.VerifyingWebPIInstallation);
+            if (File.Exists(webPiProgLoc) == true)
+            {
+                return webPiProgLoc;
+            }
+            if (File.Exists(webPiProgx86Loc) == true)
+            {
+                return webPiProgx86Loc;
+            }
+            throw new ApplicationException(Resources.ErrorInstallingWebPI);
         }
 
-        private String DownloadWebPICmdLine()
+        private String DownloadWebPI()
         {
-            try
+            String downloadLocation = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + Path.GetExtension(Resources.WebPIDownloadLoc));
+            using(DownloadHelper downloadWebPI = new DownloadHelper())
             {
-                String tempLocationToSave = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".zip");
-                using (WebClient setupDownloader = new WebClient())
-                {
-                    setupDownloader.DownloadProgressChanged += new DownloadProgressChangedEventHandler(setupDownloader_DownloadProgressChanged);
-                    setupDownloader.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(setupDownloader_DownloadFileCompleted);
-                    setupDownloader.DownloadFileAsync(new Uri(Resources.WebPICmdlineURL), tempLocationToSave);
-
-                    Console.Write("Downloading AzureSDKForNode.JS setup - ");
-                    threadBlocker = new AutoResetEvent(false);
-                    threadBlocker.WaitOne();
-                }
-                return tempLocationToSave;
+                downloadWebPI.Download(new Uri(Resources.WebPIDownloadLoc), downloadLocation);
             }
-            finally
-            {
-                if (threadBlocker != null) { threadBlocker.Close(); }
-            }
-        }
-
-        private void setupDownloader_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            if ((e.ProgressPercentage % 10 == 0) && (e.ProgressPercentage > downloadProgress))
-            {
-                downloadProgress = e.ProgressPercentage;
-                Console.Write(String.Concat(" ", e.ProgressPercentage, "%"));
-            }
-        }
-
-        private void setupDownloader_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            Console.WriteLine(String.Empty);
-            threadBlocker.Set();
+            return downloadLocation;
         }
 
         private bool WasInstallationSuccessful()
@@ -139,5 +108,6 @@ namespace DeployCmdlets4WA.Cmdlet
             string cloudServiceDllLoc = Path.Combine(this.AzureNodeSdkLoc, "Microsoft.WindowsAzure.Management.CloudService.dll");
             return File.Exists(cloudServiceDllLoc) == true;
         }
+
     }
 }

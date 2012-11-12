@@ -27,6 +27,7 @@ using System.Text;
 using System.Management.Automation;
 using System.ServiceProcess;
 using DeployCmdlets4WA.Properties;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
@@ -45,14 +46,14 @@ namespace DeployCmdlets4WA.Cmdlet
             {
                 if (controller.Status == ServiceControllerStatus.Stopped)
                 {
-                    WriteObject(string.Format(Resources.WinServiceAlreadyStopped, Service));
+                    WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.WinServiceAlreadyStopped, Service));
                 }
                 else
                 {
                     controller.Stop();
                     WriteObject(Resources.WinServiceStopping);
                     controller.WaitForStatus(ServiceControllerStatus.Stopped);
-                    WriteObject(string.Format(Resources.WinServiceStopped, Service));
+                    WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.WinServiceStopped, Service));
                 }
             }
         }

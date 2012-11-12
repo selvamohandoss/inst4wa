@@ -29,6 +29,7 @@ using DeployCmdlets4WA.Properties;
 using System.IO;
 using DeployCmdlets4WA.Utilities;
 using System.Net;
+using System.Globalization;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
@@ -48,7 +49,7 @@ namespace DeployCmdlets4WA.Cmdlet
             base.ProcessRecord();
 
             //Validate Params
-            PreValidate();
+            PreValidate(this.Url, this.UnzipLoc);
 
             //Download
             string downloadLoc = Download();
@@ -57,15 +58,15 @@ namespace DeployCmdlets4WA.Cmdlet
             Unzip(downloadLoc);
         }
 
-        private void PreValidate()
+        private static void PreValidate(string url, string unzipLoc)
         {
-            if (Uri.IsWellFormedUriString(Url, UriKind.RelativeOrAbsolute) == false)
+            if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
             {
-                throw new ArgumentException(Resources.IncorrectURL, "Url");
+                throw new ArgumentException(Resources.IncorrectURL, "url");
             }
-            if (Directory.Exists(UnzipLoc) == false)
+            if (Directory.Exists(unzipLoc) == false)
             {
-                throw new ArgumentException(Resources.UnzipLocDoesNotExist, "UnzipLoc");
+                throw new ArgumentException(Resources.UnzipLocDoesNotExist, "unzipLoc");
             }
         }
 
@@ -81,7 +82,7 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private void Unzip(string downloadLocation)
         {
-            String unzipCommand = String.Format(@"function Unzip([string]$locationOfZipFile, [string]$unzipLocation)
+            String unzipCommand = String.Format(CultureInfo.InvariantCulture, @"function Unzip([string]$locationOfZipFile, [string]$unzipLocation)
                                                 {{
                                                     Write-Host $locationOfZipFile
                                                     Write-Host $unzipLocation

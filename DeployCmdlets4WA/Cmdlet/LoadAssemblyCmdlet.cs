@@ -29,8 +29,9 @@ using System.Security.Permissions;
 using System.Collections.ObjectModel;
 using System.IO;
 using DeployCmdlets4WA.Properties;
+using System.Globalization;
 
-namespace DeployCmdlets4WA
+namespace DeployCmdlets4WA.Cmdlet
 {
     [Cmdlet(VerbsCommon.Add, "LoadAssembly")]
     public class LoadAssemblyCmdlet : PSCmdlet
@@ -41,7 +42,7 @@ namespace DeployCmdlets4WA
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         protected override void ProcessRecord()
         {
-            PreValidate();
+            PreValidate(this.CmdletsAssemblyPath);
 
             String functionBody = @"
                                     function loadAssembly()
@@ -51,15 +52,15 @@ namespace DeployCmdlets4WA
                                         Import-Module -Assembly $assemblyCollection;
                                     }}
                                     loadAssembly";
-            String functionWithAssemblyLoc = String.Format(functionBody, CmdletsAssemblyPath);
+            String functionWithAssemblyLoc = String.Format(CultureInfo.InvariantCulture, functionBody, CmdletsAssemblyPath);
             ExecutePsCmdlet("Loading the assembly inside Powershell session.", functionWithAssemblyLoc);
         }
 
-        private void PreValidate()
+        private void PreValidate(string cmdletsAssemblyPath)
         {
-            if (File.Exists(this.CmdletsAssemblyPath) == false)
+            if (File.Exists(cmdletsAssemblyPath) == false)
             {
-                throw new ArgumentException(string.Format(Resources.FileDoesNotExist,this.CmdletsAssemblyPath), "CmdletsAssemblyPath");
+                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.FileDoesNotExist, this.CmdletsAssemblyPath), "cmdletsAssemblyPath");
             }
         }
 

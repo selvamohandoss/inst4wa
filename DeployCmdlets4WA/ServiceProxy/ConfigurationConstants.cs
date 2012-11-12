@@ -43,6 +43,10 @@ namespace DeployCmdlets4WA.ServiceProxy
                 maxStringContentLength :
                 67108864;
 
+            binding.CloseTimeout = new TimeSpan(0, 5, 0);
+            binding.SendTimeout = new TimeSpan(0, 5, 0);
+            binding.ReceiveTimeout = new TimeSpan(0, 15, 0);
+
             return binding;
         }
     }

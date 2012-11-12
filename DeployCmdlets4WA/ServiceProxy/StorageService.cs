@@ -36,5 +36,8 @@ namespace DeployCmdlets4WA.ServiceProxy
 
         [DataMember(Order = 2)]
         public StorageServiceKeys StorageServiceKeys { get; set; }
+
+        [DataMember(Order = 3)]
+        public StorageServiceProperties StorageServiceProperties { get; set; }
     }
 }

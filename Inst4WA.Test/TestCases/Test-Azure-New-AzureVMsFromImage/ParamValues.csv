@@ -1,0 +1,26 @@
+Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative,IsUnbound
+Emulator,FALSE,YES,,,FALSE,TRUE
+AzureNodeJsSdkPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure,NO,,,FALSE,FALSE
+AzureDeploymentCmdletsAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.CloudService.dll,NO,,,FALSE,FALSE
+AzureMgmtCmdletsAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.dll,NO,,,FALSE,FALSE
+AzureMgmtServiceMgmtAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.ServiceManagement.dll,NO,,,FALSE,FALSE
+AzureMgmtServiceAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.Service.dll,NO,,,FALSE,FALSE
+PublishSettingsFilePath,Azure.publishsettings,NO,,,FALSE,FALSE
+StorageAccount,,NO,DomainName,stg,FALSE,FALSE
+StorageAccountLocation,West US,NO,,,FALSE,FALSE
+Location,West US,NO,,,FALSE,FALSE
+LocationXml,imagelocations.xml,NO,,,FALSE,FALSE
+ImageName,,NO,DomainName,WIN2K8-R2-WINRM,FALSE,FALSE
+VMImageName,,NO,DomainName,WIN2K8-R2-WINRM,FALSE,FALSE
+VMImageName,NonExistingImage,NO,,,TRUE,FALSE
+DomainName,,YES,,,FALSE,TRUE
+Subscription,,YES,,,FALSE,TRUE
+VMCount,1,NO,,,FALSE,FALSE
+VMCount,0,NO,,,TRUE,FALSE
+Service,,NO,DomainName,Deploy,FALSE,FALSE
+VMNamePrefix,,NO,DomainName,VM,FALSE,FALSE
+VMNamePrefix,VMNameMoreThanFifteenCharacters,NO,,,TRUE,FALSE
+AdminPassword,p@ssw0rd000,NO,,,FALSE,FALSE
+AdminPassword,p,NO,,,TRUE,FALSE
+VMLocation,West US,NO,,,FALSE,FALSE
+Force,TRUE,NO,,,FALSE,FALSE

@@ -29,7 +29,7 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace WebRole
 {
-    public class WebRole : RoleEntryPoint
+    public class HelloWorldWebRole : RoleEntryPoint
     {
         public override bool OnStart()
         {

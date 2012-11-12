@@ -28,8 +28,13 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace DeployCmdlets4WA.ServiceProxy
 {
-    public class ServiceManagementHelpers
+    public sealed class ServiceManagementHelpers
     {
+        private ServiceManagementHelpers()
+        {
+
+        }
+
         /// <summary>
         /// Method to submit the request to create new storage account and return request token.
         /// </summary>

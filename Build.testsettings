@@ -4,6 +4,9 @@
   <Deployment>
     <DeploymentItem filename="TestData\WorkerRole\" outputDirectory="TestData\WorkerRole" />
     <DeploymentItem filename="TestData\WebRole\" outputDirectory="TestData\WebRole" />
+    <DeploymentItem filename="TestData\VMRole\"  outputDirectory="TestData\VMRole" />
+    <DeploymentItem filename="imagelocations.xml" />
+    <DeploymentItem filename="remote-setup.ps1" />
     <DeploymentItem filename="Inst4WA.exe" />
     <DeploymentItem filename="Azure.publishsettings" />
     <DeploymentItem filename="TestCases\" outputDirectory="TestCases" />
