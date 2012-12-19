@@ -89,7 +89,7 @@ namespace DeployCmdlets4WA.Cmdlet
                                                     $shell_app = new-object -com shell.application
                                                     $zip_file = $shell_app.namespace($locationOfZipFile)
                                                     $destination = $shell_app.namespace($unzipLocation)
-                                                    $destination.Copyhere($zip_file.items())
+                                                    $destination.Copyhere($zip_file.items(), 0x10)
                                                 }}
                                                 Unzip ""{0}""  ""{1}""
                                                 ", downloadLocation, UnzipLoc);

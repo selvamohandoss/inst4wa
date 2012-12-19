@@ -138,13 +138,6 @@ namespace DeployCmdlets4WA.Cmdlet
             {
                 return false;
             }
-
-            //Print Image Properties.
-            WriteObject(Resources.VMImagePropHeader);
-            foreach (PSPropertyInfo eachProperty in executeGetAzureImgCmd.OutputData.ElementAt(0).Properties)
-            {
-                WriteObject(string.Format(CultureInfo.InvariantCulture, "{0} : {1}", eachProperty.Name, eachProperty.Value));
-            }
             return true;
         }
 

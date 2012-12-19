@@ -23,10 +23,8 @@ See the Apache Version 2.0 License for specific language governing permissions a
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Management.Automation;
 using System.IO;
-using System.Reflection;
 using DeployCmdlets4WA.Utilities;
 using DeployCmdlets4WA.Properties;
 using DeployCmdlets4WA.Cmdlet.ServiceConfigurationSchema;
@@ -38,6 +36,9 @@ namespace DeployCmdlets4WA.Cmdlet
     [Cmdlet(VerbsCommon.Add, "AzureWorkerRole")]
     public class AddAzureWorkerRole : PSCmdlet
     {
+        private static char[] SettingPartSplitter = new char[] { ':' };
+        private static char[] SettingSplitter = new char[] { ',' };
+
         [Parameter(Mandatory = true, HelpMessage = "Location of folder containing role binaries.")]
         [ValidateNotNullOrEmpty]
         public string RoleBinariesFolder { get; set; }
@@ -61,12 +62,15 @@ namespace DeployCmdlets4WA.Cmdlet
         [Parameter(Mandatory = false, HelpMessage = "Number of instances of worker role.")]
         public int InstanceCount { get; set; }
 
+        [Parameter(Mandatory = false, HelpMessage = "Settings to override for a Role. Specify in SettingName:SettingValue format separated by comma. Example CloudDriveSize:1024,Version:4")]
+        public string Settings { get; set; }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-            
+
             //Step 1 - Validate Params.
-            ValidateInputs(this.RoleBinariesFolder, this.CscfgFile, this.CsdefFile);
+            ValidateInputs(this.RoleBinariesFolder, this.CscfgFile, this.CsdefFile, this.Settings);
 
             //Step 2 - Copy CSCFG and CSDEF Settings.
             UpdateCSCFG();
@@ -76,7 +80,7 @@ namespace DeployCmdlets4WA.Cmdlet
             CopyBinaries();
         }
 
-        private void ValidateInputs(string roleBinariesFolder, string cscfgFile, string csdefFile)
+        private void ValidateInputs(string roleBinariesFolder, string cscfgFile, string csdefFile, string settings)
         {
             if (Directory.Exists(roleBinariesFolder) == false)
             {
@@ -93,6 +97,18 @@ namespace DeployCmdlets4WA.Cmdlet
             if (File.Exists(LocalCSCFGFile) == false || File.Exists(CloudCSCFGFile) == false || File.Exists(ServiceCSDEFFile) == false)
             {
                 throw new ArgumentException(Resources.ServiceRootInvalid);
+            }
+            if (string.IsNullOrEmpty(settings) == false)
+            {
+                string[] separatedSetting = settings.Split(SettingSplitter, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string eachSetting in separatedSetting)
+                {
+                    string[] settingParts = eachSetting.Split(SettingPartSplitter, StringSplitOptions.RemoveEmptyEntries);
+                    if (settingParts.Length != 2)
+                    {
+                        throw new ArgumentException(Resources.InvalidSettings, "settings");
+                    }
+                }
             }
         }
 
@@ -135,7 +151,7 @@ namespace DeployCmdlets4WA.Cmdlet
             {
                 throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.RoleNotFoundInCSDEF, this.RoleName));
             }
-            
+
             ServiceDefinitionSchema.WorkerRole roleToAdd = sourceCSDEF.WorkerRole.Where(eachRole => eachRole.name.ToUpperInvariant() == normalizedRoleName).FirstOrDefault();
             if (roleToAdd == null)
             {
@@ -172,9 +188,40 @@ namespace DeployCmdlets4WA.Cmdlet
             }
 
             ConfigureInstCount(roleToAdd);
+            OverrideSettings(roleToAdd);
 
             AddRole(roleToAdd, CloudCSCFGFile);
             AddRole(roleToAdd, LocalCSCFGFile);
+        }
+
+        private void OverrideSettings(RoleSettings roleToAdd)
+        {
+            if (string.IsNullOrEmpty(this.Settings) == true)
+            {
+                return;
+            }
+            if (roleToAdd.ConfigurationSettings == null)
+            {
+                WriteWarning(Resources.SettingsAbsentInCSCFG);
+                return;
+            }
+            string[] separatedSetting = Settings.Split(SettingSplitter, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string eachSetting in separatedSetting)
+            {
+                string[] settingsPart = eachSetting.Split(SettingPartSplitter, StringSplitOptions.RemoveEmptyEntries);
+                
+                //Find setting in the role to add.
+                ServiceConfigurationSchema.ConfigurationSetting settingToOverride = 
+                    roleToAdd.ConfigurationSettings.Where(e => e.name.ToLowerInvariant() == settingsPart[0].ToLowerInvariant()).FirstOrDefault();
+                //OOPS not found.
+                if (settingToOverride == null)
+                {
+                    WriteWarning(string.Format(CultureInfo.InvariantCulture, Resources.SettingsAbsentInCSCFG, settingsPart[0]));
+                    continue;
+                }
+                //Update.
+                settingToOverride.value = settingsPart[1];
+            }
         }
 
         private void ConfigureInstCount(RoleSettings roleToAdd)
@@ -189,9 +236,9 @@ namespace DeployCmdlets4WA.Cmdlet
         private void AddRole(RoleSettings roleToAdd, string cscfgFileLoc)
         {
             ServiceConfigurationSchema.ServiceConfiguration config = SerializationUtils.DeserializeXmlFile<ServiceConfigurationSchema.ServiceConfiguration>(cscfgFileLoc);
-            
+
             string roleNameToAdd = roleToAdd.name.ToUpperInvariant();
-            if(config.Role != null)
+            if (config.Role != null)
             {
                 //Check if role to be added is already present inside the cscfg. If so just update instance count.
                 RoleSettings matchingRoleInConfig = config.Role.Where(eachRole => eachRole.name.ToUpperInvariant() == roleNameToAdd).FirstOrDefault();
@@ -203,7 +250,7 @@ namespace DeployCmdlets4WA.Cmdlet
                     return;
                 }
             }
-            
+
             List<ServiceConfigurationSchema.RoleSettings> roles = new List<ServiceConfigurationSchema.RoleSettings>();
             //Retain existing roles inside the cscfg.
             if (config.Role != null)

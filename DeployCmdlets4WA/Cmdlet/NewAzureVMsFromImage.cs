@@ -107,28 +107,16 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private bool ServiceExists()
         {
-            ExecutePSCmdlet executeGetServiceCmd = new ExecutePSCmdlet();
-            executeGetServiceCmd.Execute(string.Format(CultureInfo.InvariantCulture, Resources.VerifyIfServiceExist, Service), "Get-AzureService");
+            string command = string.Format("@(Get-AzureService | % {{ $_ }} | WHERE-Object {{$_.ServiceName -eq \"{0}\" }}).Count", Service.Trim());
 
-            if (executeGetServiceCmd.ErrorOccurred == true)
-            {
-                throw new ApplicationFailedException(Resources.ErrorVerifyingIfServiceExist);
-            }
+            ExecutePSCmdlet executeGetServiceCmd = new ExecutePSCmdlet();
+            executeGetServiceCmd.Execute(string.Format(CultureInfo.InvariantCulture, Resources.VerifyIfServiceExist, Service), command);
+
             if (executeGetServiceCmd.OutputData == null || executeGetServiceCmd.OutputData.Count() == 0)
             {
                 return false;
             }
-            bool exists = false;
-            string formattedServiceName = Service.ToUpperInvariant();
-            foreach (PSObject eachServiceDetail in executeGetServiceCmd.OutputData)
-            {
-                if (eachServiceDetail.Properties["ServiceName"].Value.ToString().ToUpperInvariant() == formattedServiceName)
-                {
-                    exists = true;
-                    break;
-                }
-            }
-            return exists;
+            return int.Parse(executeGetServiceCmd.OutputData.ElementAt(0).ToString()) == 1;
         }
 
         private void CreateService()

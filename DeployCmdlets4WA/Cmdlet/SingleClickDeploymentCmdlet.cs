@@ -70,7 +70,8 @@ namespace DeployCmdlets4WA.Cmdlet
         private RuntimeDefinedParameterDictionary _runtimeParamsCollection;
         private AutoResetEvent _threadBlocker;
         private DeploymentModelHelper _controller;
-
+        
+        private bool _errorsExecutingCmdlet;
         // method to get Downloads folder path
         private static readonly Guid DownloadsFolderGUID = new Guid("374DE290-123F-4565-9164-39C4925E467B");
 
@@ -272,9 +273,9 @@ namespace DeployCmdlets4WA.Cmdlet
         private bool ExecutePsCmdlet(String beginMessage, String command)
         {
             Console.WriteLine(beginMessage);
-
             try
             {
+                _errorsExecutingCmdlet = false;
                 Runspace executePsCmdletRunspace = Runspace.DefaultRunspace;
                 using (Pipeline executePsCmdletPipeline = executePsCmdletRunspace.CreateNestedPipeline(command, true))
                 {
@@ -282,13 +283,13 @@ namespace DeployCmdlets4WA.Cmdlet
                     executePsCmdletPipeline.Output.DataReady += new EventHandler(Output_DataReadyExecutePsCmdlet);
                     executePsCmdletPipeline.Invoke();
                 }
+                return !_errorsExecutingCmdlet;
             }
             catch (Exception exc)
             {
                 Log(LogType.Error, "Exception while executing cmdlet: " + exc.Message);
                 return false;
             }
-            return true;
         }
 
         private void Output_DataReadyExecutePsCmdlet(object sender, EventArgs e)
@@ -310,7 +311,8 @@ namespace DeployCmdlets4WA.Cmdlet
             {
                 while (reader.Count > 0)
                 {
-                    Console.WriteLine(reader.Read().ToString());
+                    _errorsExecutingCmdlet = true;
+                    Log(LogType.Error, reader.Read().ToString());
                 }
             }
         }

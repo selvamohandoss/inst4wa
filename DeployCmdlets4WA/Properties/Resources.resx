@@ -416,4 +416,13 @@
   <data name="WebPIDownloadLoc" xml:space="preserve">
     <value>http://download.microsoft.com/download/7/0/4/704CEB4C-9F42-4962-A2B0-5C84B0682C7A/WebPlatformInstaller_amd64_en-US.msi</value>
   </data>
+  <data name="InvalidSettings" xml:space="preserve">
+    <value>Invalid value for Settings. Setting should be provided in SettingName:SettingValue format separated by comma. </value>
+  </data>
+  <data name="SettingAbsentInCSCFG" xml:space="preserve">
+    <value>Setting '{0}' absent in CscfgFile.</value>
+  </data>
+  <data name="SettingsAbsentInCSCFG" xml:space="preserve">
+    <value>CscfgFile does not have any settings.</value>
+  </data>
 </root>

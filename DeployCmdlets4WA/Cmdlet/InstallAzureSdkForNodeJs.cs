@@ -37,8 +37,8 @@ namespace DeployCmdlets4WA.Cmdlet
     [Cmdlet("Install", "AzureSdkForNodeJs")]
     public class InstallAzureSdkForNodeJS : PSCmdlet
     {
-        private const string webPiProgLoc = @"\Program Files\Microsoft\Web Platform Installer\WebpiCmd.exe";
-        private const string webPiProgx86Loc = @"\Program Files (x86)\Microsoft\Web Platform Installer\WebpiCmd.exe";
+        private const string webPiProgLoc = @"Program Files\Microsoft\Web Platform Installer\WebpiCmd.exe";
+        private const string webPiProgx86Loc = @"Program Files (x86)\Microsoft\Web Platform Installer\WebpiCmd.exe";
 
         [Parameter(Mandatory = true, HelpMessage = "Specify the location where Azure node sdk is installed.")]
         public string AzureNodeSdkLoc { get; set; }
@@ -79,16 +79,18 @@ namespace DeployCmdlets4WA.Cmdlet
         private string InstallWebPI(string downloadLocation)
         {
             String installCmd = String.Format(CultureInfo.InvariantCulture, "Start-Process -File msiexec.exe -ArgumentList /qn, /i, \"{0}\" -Wait", downloadLocation);
-            Utilities.ExecuteCommands.ExecuteCommand(installCmd, this.Host);
+            String windir = GetWinDir();
 
+            Utilities.ExecuteCommands.ExecuteCommand(installCmd, this.Host);
+            
             WriteObject(Resources.VerifyingWebPIInstallation);
-            if (File.Exists(webPiProgLoc) == true)
+            if (File.Exists(Path.Combine(windir, webPiProgLoc)) == true)
             {
-                return webPiProgLoc;
+                return Path.Combine(windir, webPiProgLoc);
             }
-            if (File.Exists(webPiProgx86Loc) == true)
+            if (File.Exists(Path.Combine(windir, webPiProgx86Loc)) == true)
             {
-                return webPiProgx86Loc;
+                return Path.Combine(windir, webPiProgx86Loc);
             }
             throw new ApplicationException(Resources.ErrorInstallingWebPI);
         }
@@ -109,5 +111,10 @@ namespace DeployCmdlets4WA.Cmdlet
             return File.Exists(cloudServiceDllLoc) == true;
         }
 
+        private static string GetWinDir()
+        {
+            string windirEnvVar = Environment.GetEnvironmentVariable("windir");
+            return Path.GetPathRoot(windirEnvVar);
+        }
     }
 }

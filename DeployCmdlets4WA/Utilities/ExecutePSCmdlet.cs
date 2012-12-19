@@ -11,6 +11,7 @@ namespace DeployCmdlets4WA.Utilities
     public class ExecutePSCmdlet
     {
         private List<PSObject> _outputData;
+        private List<Object> _errorData;
 
         public bool ErrorOccurred { get; private set; }
 
@@ -22,9 +23,19 @@ namespace DeployCmdlets4WA.Utilities
             }
         }
 
+        public IEnumerable<Object> ErrorData 
+        {
+            get
+            {
+                return _errorData;
+            }
+        }
+
         public Collection<PSObject> Execute(String beginMessage, String command)
         {
             _outputData = new List<PSObject>();
+            _errorData = new List<Object>();
+
             Console.WriteLine(beginMessage);
             Runspace executePsCmdletRunspace = Runspace.DefaultRunspace;
             using (Pipeline executePsCmdletPipeline = executePsCmdletRunspace.CreateNestedPipeline(command, true))
@@ -61,6 +72,7 @@ namespace DeployCmdlets4WA.Utilities
                 {
                     ErrorOccurred = true;
                     object result = reader.Read();
+                    _errorData.Add(result);
                     Console.WriteLine(result.ToString());
                 }
             }
