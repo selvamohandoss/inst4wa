@@ -47,6 +47,13 @@ namespace DeployCmdlets4WA.Cmdlet
         {
             base.ProcessRecord();
 
+            Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "Powershell version - {0}", this.Host.Version.ToString()));
+
+            if (this.Host.Version.Major < 3)
+            {
+                throw new ApplicationFailedException(Resources.PowersehllV3Required);
+            }
+
             //Download the WebPI.
             String downloadLocation = DownloadWebPI();
 
@@ -71,7 +78,7 @@ namespace DeployCmdlets4WA.Cmdlet
             FileStream logFileFs = File.Create(logFileName);
             logFileFs.Close();
 
-            String installCommand = String.Format(CultureInfo.InvariantCulture, "Start-Process -File \"{0}\" -ArgumentList \" /Install /Products:AzureNodeSDK,AzureNodePowershell /Log:{1} /AcceptEULA \" -Wait", pathToWebPIExe, logFileName);
+            String installCommand = String.Format(CultureInfo.InvariantCulture, "Start-Process -File \"{0}\" -ArgumentList \" /Install /Products:AzureNodeSDK,AzureNodePowershell,WindowsAzurePowershell /Log:{1} /AcceptEULA \" -Wait", pathToWebPIExe, logFileName);
             ExecuteCommands.ExecuteCommand(installCommand, this.Host);
             return logFileName;
         }

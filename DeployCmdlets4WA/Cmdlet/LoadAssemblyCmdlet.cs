@@ -49,7 +49,7 @@ namespace DeployCmdlets4WA.Cmdlet
                                     {{
                                         $assemblyloaded = [System.Reflection.Assembly]::LoadFrom(""{0}"");
                                         $assemblyCollection = @($assemblyloaded); 
-                                        Import-Module -Assembly $assemblyCollection;
+                                        Import-Module -Assembly $assemblyCollection -NoClobber;
                                     }}
                                     loadAssembly";
             String functionWithAssemblyLoc = String.Format(CultureInfo.InvariantCulture, functionBody, CmdletsAssemblyPath);

@@ -9,15 +9,17 @@ This tool consists of a commandline tool and a set of commandlets for deploying 
 
 The following steps are common to all the sections below:
 
-1. The recommended way is to download and expand the binaries for the latest build located at http://msopentechstorage.blob.core.windows.net/inst4wa/Inst4WA-12182012.zip and skip to step 3. 
+1. Powershell 3.0 is required to run this installer. Please follow the instructions described at http://technet.microsoft.com/en-us/library/hh847837.aspx to install Powershell 3.0.
 
-2. If you would rather download the source code and build it yourself, you can do so by clicking on the ZIP button above. Note that the zip file has a long file name that will cause problems while building, so you will need to rename the folder name to make it short. You will need Visual Studio 2010 Ultimate Edition, the Windows Azure SDK 1.7, and SQL Server Compact Edition 3.5. There is a build.cmd file in the root that you can run to do a full build.
+2. The recommended way is to download and expand the binaries for the latest build located at http://msopentechstorage.blob.core.windows.net/inst4wa/Inst4WA-12182012.zip and skip to step 3. 
 
-3. Change directory to the build\Debug or build\Release folder.
+3. If you would rather download the source code and build it yourself, you can do so by clicking on the ZIP button above. Note that the zip file has a long file name that will cause problems while building, so you will need to rename the folder name to make it short. You will need Visual Studio 2010 Ultimate Edition, the Windows Azure SDK 1.7, and SQL Server Compact Edition 3.5. There is a build.cmd file in the root that you can run to do a full build.
 
-4. If you are going to use the configuration files given below without modification, then you will need to replace "Azure.publishsettings" with the publish setting file containing your Azure subscription details. You can also create your own configuration files and then choose to either not specify the publishsettings file (in which case the tool will ask you to download it from Azure portal) or use your own path to your publishsettings file.
+4. Change directory to the build\Debug or build\Release folder.
 
-5. Please make sure that you unblock all the dll's and config files using instructions at http://msdn.microsoft.com/en-us/library/ee890038(VS.100).aspx. 
+5. If you are going to use the configuration files given below without modification, then you will need to replace "Azure.publishsettings" with the publish setting file containing your Azure subscription details. You can also create your own configuration files and then choose to either not specify the publishsettings file (in which case the tool will ask you to download it from Azure portal) or use your own path to your publishsettings file.
+
+6. Please make sure that you unblock all the dll's and config files using instructions at http://msdn.microsoft.com/en-us/library/ee890038(VS.100).aspx. 
 
 ## Specific Steps for Deploying a HelloWorld Solution Consisting of a WebRole (PaaS)
 

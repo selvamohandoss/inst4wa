@@ -110,13 +110,10 @@ namespace Inst4WA
         {
             int psVersion = GetPowershellVersion();
 
-            if ((psVersion <= 0) || (psVersion > 3))
+            if (psVersion < 3)
             {
-                throw new Exception("Unsupported powershell version.");
+                throw new Exception("Unsupported powershell version. Powershell 3.0 is required for installation.");
             }
-
-            if (psVersion == 3) // no config needed for PS 3.0
-                return;
 
             List<string> locationOfPowershellExe = GetPowershellLocation();
             if (locationOfPowershellExe == null || locationOfPowershellExe.Count == 0)
@@ -124,24 +121,15 @@ namespace Inst4WA
                 throw new Exception("Unable to locate powershell exe.");
             }
 
-            //Create config file if not exists.
-            foreach (string eachLocation in locationOfPowershellExe)
+            if (psVersion == 3)
             {
-                string configFileLoc = System.IO.Path.Combine(eachLocation, "powershell.exe.config");
-                if (File.Exists(configFileLoc) == false)
+                // no config changes are needed for PS 3.0
+                foreach (string eachLocation in locationOfPowershellExe)
                 {
-                    FileStream configStream = File.Create(configFileLoc);
-                    using (XmlTextWriter textWriter = new XmlTextWriter(configStream, null))
-                    {
-                        textWriter.WriteStartElement("configuration"); //Append Root node otherwise xmldocument cannot load the config file.
-                        textWriter.WriteEndElement();
-                    }
-                    configStream.Close();
-                    configStream.Dispose();
+                    string configFileLoc = System.IO.Path.Combine(eachLocation, "powershell.exe.config");
+                    RevertConfigChanges(configFileLoc);
                 }
-
-                //Prepate config file.
-                PrepareConfigFile(configFileLoc);
+                return;
             }
         }
 
@@ -156,7 +144,7 @@ namespace Inst4WA
             return -1;
         }
 
-        private static void PrepareConfigFile(string configFileLoc)
+        private static void RevertConfigChanges(string configFileLoc)
         {
             //Load config file.
             XmlDocument configFile = new XmlDocument();
@@ -168,41 +156,12 @@ namespace Inst4WA
 
             //Check if start up node is present.
             XmlNode startupNode = configurationNode.SelectSingleNode("startup");
-            if (startupNode == null)
+            if (startupNode != null)
             {
-                startupNode = configFile.CreateNode(XmlNodeType.Element, "startup", string.Empty);
-                configurationNode.AppendChild(startupNode);
+                //Remove start up node itself.
+                configurationNode.RemoveChild(startupNode);
+                configFile.Save(configFileLoc);
             }
-
-            //Check runtime policy attribute if it does not exist.
-            XmlAttribute runtimePolicyAttr = startupNode.Attributes["useLegacyV2RuntimeActivationPolicy"];
-            if (runtimePolicyAttr == null)
-            {
-                runtimePolicyAttr = configFile.CreateAttribute("useLegacyV2RuntimeActivationPolicy");
-                runtimePolicyAttr.Value = "true";
-                startupNode.Attributes.Append(runtimePolicyAttr);
-            }
-
-            //Add supported runtime version node.
-            string[] requiredVersions = new string[4] { "v3.5", "v3.0", "v2.0.50727", "v4.0.30319" };
-
-            //Add supported runtime version node.
-            foreach (string version in requiredVersions)
-            {
-                XmlNode supportedRunTimeVersionNode = startupNode.SelectSingleNode(string.Format("supportedRuntime[@version='{0}']", version));
-                if (supportedRunTimeVersionNode == null)
-                {
-                    supportedRunTimeVersionNode = configFile.CreateElement("supportedRuntime");
-
-                    XmlAttribute supportedRuntimeVer = configFile.CreateAttribute("version");
-                    supportedRuntimeVer.Value = version;
-                    supportedRunTimeVersionNode.Attributes.Append(supportedRuntimeVer);
-
-                    startupNode.AppendChild(supportedRunTimeVersionNode);
-                }
-            }
-
-            configFile.Save(configFileLoc);
         }
 
         private static List<string> GetPowershellLocation()

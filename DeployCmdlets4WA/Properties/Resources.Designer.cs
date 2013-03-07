@@ -553,6 +553,15 @@ namespace DeployCmdlets4WA.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Powershell 3.0 is required. Please follow instructions on http://technet.microsoft.com/en-us/library/hh847837.aspx to install Powershell 3.0.
+        /// </summary>
+        internal static string PowersehllV3Required {
+            get {
+                return ResourceManager.GetString("PowersehllV3Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Role &apos;{0}&apos; already present in the CSCFG. Instance count is {1}..
         /// </summary>
         internal static string RoleAlreadyPresentInCSCFG {

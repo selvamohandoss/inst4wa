@@ -52,12 +52,12 @@ function logInput {
     Display the usage
 #>
 function showUsageAndExit() {
-    Write-Host "`r`nUSAGE: remote-setup.ps1 <OSSInstallScript> <Service> <Admin-Password> <WinRM-EndPointName-Prefix> `r`n" -foregroundcolor "green"
+    Write-Host "`r`nUSAGE: remote-setup.ps1 <OSSInstallScript> <Service> <Admin-Password> <WinRM-EndPointName-Prefix> [Params-to-be-passed-to-OSSInstallScript] `r`n" -foregroundcolor "green"
     exit 1
 }
 
 # Gets the commandline arguments
-if($args.Count -ne 4)
+if($args.Count -lt 4)
 {
     logErr "Missing required arguments`r`n"
     showUsageAndExit
@@ -116,7 +116,13 @@ foreach ($port in $result.Get_Item("ports")) {
     $success = $false;
     try 
     {
-        Invoke-Command -ComputerName $result.Get_Item("dns") -Port $port -Credential $cred -FilePath $args[0] -ArgumentList ($result.Get_Item("ips")) -ErrorAction Stop
+        $argumentsForOSSScript = @();
+        $argumentsForOSSScript += $result.Get_Item("ips");
+        #First four args are requried by remote-setup.ps1..rest all are passed on to OOSScript
+        if($args.Count -gt 4){
+            $argumentsForOSSScript += $args[4];
+        }
+        Invoke-Command -ComputerName $result.Get_Item("dns") -Port $port -Credential $cred -FilePath $args[0] -ArgumentList $argumentsForOSSScript  -ErrorAction Stop
         $success = $true
     }
     catch [Exception]

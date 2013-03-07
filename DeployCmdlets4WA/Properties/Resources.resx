@@ -425,4 +425,7 @@
   <data name="SettingsAbsentInCSCFG" xml:space="preserve">
     <value>CscfgFile does not have any settings.</value>
   </data>
+  <data name="PowersehllV3Required" xml:space="preserve">
+    <value>Powershell 3.0 is required. Please follow instructions on http://technet.microsoft.com/en-us/library/hh847837.aspx to install Powershell 3.0</value>
+  </data>
 </root>
