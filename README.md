@@ -11,7 +11,7 @@ The following steps are common to all the sections below:
 
 1. Powershell 3.0 is required to run this installer. Please follow the instructions described at http://technet.microsoft.com/en-us/library/hh847837.aspx to install Powershell 3.0.
 
-2. The recommended way is to download and expand the binaries for the latest build located at http://msopentechstorage.blob.core.windows.net/inst4wa/Inst4WA-12182012.zip and skip to step 3. 
+2. The recommended way is to download and expand the binaries for the latest build located at http://msopentechrelease.blob.core.windows.net/inst4wa/Inst4wa.zip and skip to step 3 in the next section. 
 
 3. If you would rather download the source code and build it yourself, you can do so by clicking on the ZIP button above. Note that the zip file has a long file name that will cause problems while building, so you will need to rename the folder name to make it short. You will need Visual Studio 2010 Ultimate Edition, the Windows Azure SDK 1.7, and SQL Server Compact Edition 3.5. There is a build.cmd file in the root that you can run to do a full build.
 
