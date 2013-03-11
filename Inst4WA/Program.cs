@@ -123,11 +123,14 @@ namespace Inst4WA
 
             if (psVersion == 3)
             {
-                // no config changes are needed for PS 3.0
+                //No config changes are needed for PS 3.0
                 foreach (string eachLocation in locationOfPowershellExe)
                 {
                     string configFileLoc = System.IO.Path.Combine(eachLocation, "powershell.exe.config");
-                    RevertConfigChanges(configFileLoc);
+                    if (File.Exists(configFileLoc) == true)
+                    {
+                        RevertConfigChanges(configFileLoc);
+                    }
                 }
                 return;
             }
@@ -146,21 +149,30 @@ namespace Inst4WA
 
         private static void RevertConfigChanges(string configFileLoc)
         {
-            //Load config file.
-            XmlDocument configFile = new XmlDocument();
-
-            string configFileContext = File.ReadAllText(configFileLoc);
-            configFile.LoadXml(configFileContext);
-
-            XmlNode configurationNode = configFile.SelectSingleNode("configuration");
-
-            //Check if start up node is present.
-            XmlNode startupNode = configurationNode.SelectSingleNode("startup");
-            if (startupNode != null)
+            try
             {
-                //Remove start up node itself.
-                configurationNode.RemoveChild(startupNode);
-                configFile.Save(configFileLoc);
+                //Load config file.
+                XmlDocument configFile = new XmlDocument();
+
+                string configFileContext = File.ReadAllText(configFileLoc);
+                configFile.LoadXml(configFileContext);
+
+                XmlNode configurationNode = configFile.SelectSingleNode("configuration");
+
+                if (configurationNode != null)
+                {
+                    //Check if start up node is present.
+                    XmlNode startupNode = configurationNode.SelectSingleNode("startup");
+                    if (startupNode != null)
+                    {
+                        //Remove start up node itself.
+                        configurationNode.RemoveChild(startupNode);
+                        configFile.Save(configFileLoc);
+                    }
+                }
+            }
+            catch (XmlException)
+            {
             }
         }
 
