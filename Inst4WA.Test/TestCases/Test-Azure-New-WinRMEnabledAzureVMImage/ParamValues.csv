@@ -1,10 +1,6 @@
 Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative,IsUnbound
 Emulator,FALSE,YES,,,FALSE,TRUE
-AzureNodeJsSdkPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure,YES,,,FALSE,FALSE
-AzureDeploymentCmdletsAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.CloudService.dll,YES,,,FALSE,FALSE
-AzureMgmtCmdletsAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.dll,YES,,,FALSE,FALSE
-AzureMgmtServiceMgmtAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.ServiceManagement.dll,YES,,,FALSE,FALSE
-AzureMgmtServiceAssemblyPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.Service.dll,YES,,,FALSE,FALSE
+AzureNodeJsSdkPath,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure.psd1,YES,,,FALSE,FALSE
 PublishSettingsFilePath,Azure.publishsettings,YES,,,FALSE,FALSE
 StorageAccount,,NO,DomainName,stg,FALSE,FALSE
 StorageAccountLocation,West US,YES,,,FALSE,FALSE

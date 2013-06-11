@@ -114,8 +114,7 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private bool WasInstallationSuccessful()
         {
-            string cloudServiceDllLoc = Path.Combine(this.AzureNodeSdkLoc, "Microsoft.WindowsAzure.Management.CloudService.dll");
-            return File.Exists(cloudServiceDllLoc) == true;
+            return File.Exists(this.AzureNodeSdkLoc) == true;
         }
 
         private static string GetWinDir()

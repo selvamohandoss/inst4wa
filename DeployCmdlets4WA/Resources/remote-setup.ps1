@@ -52,12 +52,12 @@ function logInput {
     Display the usage
 #>
 function showUsageAndExit() {
-    Write-Host "`r`nUSAGE: remote-setup.ps1 <OSSInstallScript> <Service> <Admin-Password> <WinRM-EndPointName-Prefix> [Params-to-be-passed-to-OSSInstallScript] `r`n" -foregroundcolor "green"
+    Write-Host "`r`nUSAGE: remote-setup.ps1 <OSSInstallScript> <Service> <Admin-Username> <Admin-Password> <WinRM-EndPointName-Prefix> [Params-to-be-passed-to-OSSInstallScript] `r`n" -foregroundcolor "green"
     exit 1
 }
 
 # Gets the commandline arguments
-if($args.Count -lt 4)
+if($args.Count -lt 5)
 {
     logErr "Missing required arguments`r`n"
     showUsageAndExit
@@ -67,13 +67,13 @@ if($args.Count -lt 4)
 <#
     Reads the configuration file config.json 
 #>
-function get-Config([string]$service, [string]$adminPassword, [string]$winrmEpName)
+function get-Config([string]$service, [string]$adminUsername, [string]$adminPassword, [string]$winrmEpName)
 {
    
         [hashtable]$result = @{} 
         $result.dnsPrefix = $service
         $result.dns = $service + ".cloudapp.net"
-        $result.user = "Administrator"
+        $result.user = $adminUsername
         $result.password = $adminPassword
        
         $result.ports = @();
@@ -100,7 +100,7 @@ function get-Config([string]$service, [string]$adminPassword, [string]$winrmEpNa
 }
 
 logStatus "Reading the configuration file.."
-$result = get-Config $args[1] $args[2] $args[3]
+$result = get-Config $args[1] $args[2] $args[3] $args[4]
 logStatus ("DNS: " + $result.Get_Item("dns"))
 logStatus ("VM IP Addresses:" + $result.Get_Item("ips"))
 $secpasswd = ConvertTo-SecureString $result.Get_Item("password") -AsPlainText -Force
@@ -119,8 +119,8 @@ foreach ($port in $result.Get_Item("ports")) {
         $argumentsForOSSScript = @();
         $argumentsForOSSScript += $result.Get_Item("ips");
         #First four args are requried by remote-setup.ps1..rest all are passed on to OOSScript
-        if($args.Count -gt 4){
-            $argumentsForOSSScript += $args[4];
+        if($args.Count -gt 5){
+            $argumentsForOSSScript += $args[5];
         }
         Invoke-Command -ComputerName $result.Get_Item("dns") -Port $port -Credential $cred -FilePath $args[0] -ArgumentList $argumentsForOSSScript  -ErrorAction Stop
         $success = $true
