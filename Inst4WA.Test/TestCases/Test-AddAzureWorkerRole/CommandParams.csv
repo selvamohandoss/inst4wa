@@ -1,7 +1,6 @@
 Command, Name, ParameterName, Name, ParameterName, Name, ParameterName, Name, ParameterName, Name, ParameterName, Name, ParameterName
 Cmdlet:Install-AzureSdkForNodeJs,AzureNodeSdkLoc,AzureNodeSdkLoc,,,,,,,,,,
-Cmdlet:Add-LoadAssembly.1,CmdletsAssemblyPath,CloudServiceDll,,,,,,,,,,
-Cmdlet:Add-LoadAssembly.2,CmdletsAssemblyPath,MgmtDll,,,,,,,,,,
+Cmdlet:Import-Module,Name,AzureNodeSdkLoc,NoClobber,,,,,,,,,
 Cmdlet:New-ApplicationDirectory,AppFolder,WorkerRoleDir,,,,,,,,,,
 Cmdlet:New-AzureServiceProject,ServiceName,WorkerRoleServiceName,,,,,,,,,,
 Cmdlet:Add-AzureWorkerRole,RoleBinariesFolder,WorkerRoleBinaries,CSCFGFile,WorkerRoleCSCFG,CSDEFFile,WorkerRoleCSDEF,RoleName,WorkerRoleName,VMSize,WorkerRoleVMSize,InstanceCount,WorkerRoleInstCnt

@@ -1,7 +1,5 @@
 Name,Value,Required,ValuePrefixRef,ValueSuffix,IsNegative,IsUnbound
-AzureNodeSdkLoc,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure,NO,,,FALSE,FALSE
-CloudServiceDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.CloudService.dll,NO,,,FALSE,FALSE
-MgmtDll,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Microsoft.WindowsAzure.Management.dll,NO,,,FALSE,FALSE
+AzureNodeSdkLoc,%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure.psd1,NO,,,FALSE,FALSE
 WebRoleDir,C:\temp\helloworldwebrole,NO,,,FALSE,FALSE
 WebRoleServiceName,HelloWorldWebRole,NO,,,FALSE,FALSE
 WebRoleBinaries,TestData\WebRole\bin,NO,,,FALSE,FALSE

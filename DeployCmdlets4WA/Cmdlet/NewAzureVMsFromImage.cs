@@ -46,6 +46,10 @@ namespace DeployCmdlets4WA.Cmdlet
         public string AdminPassword { get; set; }
 
         [Parameter(Mandatory = true)]
+        [ValidateNotNullOrEmpty]
+        public string AdminUsername { get; set; }
+
+        [Parameter(Mandatory = true)]
         public string Force { get; set; }
 
         protected override void ProcessRecord()
@@ -60,8 +64,6 @@ namespace DeployCmdlets4WA.Cmdlet
 
             Service = Service.Trim();
             VMNamePrefix = VMNamePrefix.Trim();
-
-            //System.Diagnostics.Debugger.Launch();
 
             //Set default value of optional params.
             InstanceSize = String.IsNullOrEmpty(InstanceSize) == true ? "Small" : InstanceSize;
@@ -136,7 +138,7 @@ namespace DeployCmdlets4WA.Cmdlet
         {
             int i = 1;
             int waitPeriodInSeconds = _waitPeriod / 1000;
-            string createVMCmdTemplate = "New-AzureVMConfig -Name \"{0}\" -InstanceSize {1} -ImageName \"{2}\" |  Add-AzureProvisioningConfig -Windows -Password {3} | New-AzureVM –ServiceName \"{4}\"";
+            string createVMCmdTemplate = "New-AzureVMConfig -Name \"{0}\" -InstanceSize {1} -ImageName \"{2}\" |  Add-AzureProvisioningConfig -Windows -Password {3} -AdminUserName \"{4}\" -EnableWinRMHttp | New-AzureVM –ServiceName \"{5}\"";
 
             List<string> existingVMs = GetExistingVMs();
 
@@ -160,7 +162,7 @@ namespace DeployCmdlets4WA.Cmdlet
                 }
 
                 int currentRetryCount = 1;
-                string createVMCmd = string.Format(CultureInfo.InvariantCulture, createVMCmdTemplate, new string[] { vmname, InstanceSize, ImageName, AdminPassword, Service });
+                string createVMCmd = string.Format(CultureInfo.InvariantCulture, createVMCmdTemplate, new string[] { vmname, InstanceSize, ImageName, AdminPassword, AdminUsername, Service });
 
                 while (true)
                 {
