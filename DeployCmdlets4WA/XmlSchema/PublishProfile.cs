@@ -20,7 +20,7 @@ See the Apache Version 2.0 License for specific language governing permissions a
 */
 #endregion
 
-namespace Microsoft.WindowsAzure.Management.XmlSchema
+namespace Microsoft.WindowsAzure.Management.XmlSchema.V1
 {
     using System.Xml.Serialization;
 

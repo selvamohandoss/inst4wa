@@ -74,7 +74,6 @@
       <CommandParam Name="StorageAccountName" ParameterName="StorageAccountName" />
       <CommandParam Name="Slot" ParameterName="DeploymentOption" />
       <CommandParam Name="Location" ParameterName="Location" />
-      <CommandParam Name="Subscription" ParameterName="Subscription" />
     </Step>
     <Step Type="Cmdlet" Command="Ping-ServiceEndpoints" Message="Verifying the Endpoints.">
       <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />

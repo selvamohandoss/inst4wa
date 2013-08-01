@@ -3,6 +3,5 @@ Cmdlet:Install-AzureSdkForNodeJs,AzureNodeSdkLoc,AzureNodeJsSdkPath,,,,,,,,,,,,
 Cmdlet:Import-Module,Name,AzureNodeJsSdkPath,NoClobber,,,,,,,,,,,
 Cmdlet:Import-AzurePublishSettingsFile,PublishSettingsFile,PublishSettingsFilePath,,,,,,,,,,,,
 Cmdlet:Set-AzureStorageAccountEx,PublishSettingsFile,PublishSettingsFilePath,Subscription,Subscription,StorageAccount,StorageAccount,Location,StorageAccountLocation,CreateOnly,,SetDefault,,,
-Cmdlet:New-WinRMEnabledAzureVMImage,Location,Location,LocationXml,LocationXml,ImageName,ImageName,Subscription,Subscription,StorageAccount,StorageAccount,PublishSettingsFile,PublishSettingsFilePath,,
-Cmdlet:New-AzureVMsFromImage,Count,VMCount,ImageName,VMImageName,Service,Service,Location,VMLocation,VMNamePrefix,VMNamePrefix,AdminPassword,AdminPassword,Force,Force
+Cmdlet:New-AzureVMsFromImage,Count,VMCount,Service,Service,Location,VMLocation,VMNamePrefix,VMNamePrefix,AdminPassword,AdminPassword,AdminUsername,AdminUsername,Force,Force
 Cmdlet:Set-AzureSubscription,DefaultSubscription,Subscription,,,,,,,,,,,,

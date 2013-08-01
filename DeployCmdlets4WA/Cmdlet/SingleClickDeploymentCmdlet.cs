@@ -84,6 +84,8 @@ namespace DeployCmdlets4WA.Cmdlet
             if (_isXmlPathValid == false || !ValidateParameters())
                 return;
 
+            Init();
+
             if (IsEmulator() == false)
             {
                 string pubSettingsFilePath = string.Empty;
@@ -317,17 +319,20 @@ namespace DeployCmdlets4WA.Cmdlet
             }
         }
 
+        private void Init()
+        {
+            string serviceEnvironment = GetParamValue("ServiceEnvironment");
+            string serviceModel = GetParamValue("ServiceModel");
+
+            Utils.Init(serviceEnvironment, serviceModel);
+        }
+
         private bool DownloadPublishSettings()
         {
             bool bRet = true;
 
-            // determine paas or iaas
-            bool isIaaS = false;
-            string serviceModel = GetParamValue("ServiceModel");
-            if (!string.IsNullOrEmpty(serviceModel))
-                isIaaS = (serviceModel.ToUpperInvariant() == "IAAS");
+            Process.Start(Utils.PublishSettingsURL);
 
-            Process.Start(isIaaS ? Resources.AzureIaaSPublishSettingsURL : Resources.AzurePaaSPublishSettingsURL);
             Console.WriteLine("Waiting for publish settings file.");
 
             _publishSettingsPath = GetParamValue("PublishSettingsPath");

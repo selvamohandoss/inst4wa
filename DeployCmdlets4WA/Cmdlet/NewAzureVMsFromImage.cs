@@ -21,8 +21,7 @@ namespace DeployCmdlets4WA.Cmdlet
         [Parameter(Mandatory = true)]
         public int Count { get; set; }
 
-        [Parameter(Mandatory = true)]
-        [ValidateNotNullOrEmpty]
+        [Parameter(Mandatory = false)]
         public string ImageName { get; set; }
 
         [Parameter(Mandatory = true)]
@@ -160,6 +159,10 @@ namespace DeployCmdlets4WA.Cmdlet
                         DeleteVMWithOSDisk(vmname);
                     }
                 }
+
+                // get vm image name if none was specified
+                if (string.IsNullOrEmpty(ImageName))
+                    ImageName = GetWin2KImageName();
 
                 int currentRetryCount = 1;
                 string createVMCmd = string.Format(CultureInfo.InvariantCulture, createVMCmdTemplate, new string[] { vmname, InstanceSize, ImageName, AdminPassword, AdminUsername, Service });
@@ -352,5 +355,35 @@ namespace DeployCmdlets4WA.Cmdlet
                 throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, Resources.InvalidVMName, vmName), "vmName");
             }
         }
+
+        private string GetWin2KImageName()
+        {
+            // get all images and look for the desired pattern in family name
+            ExecutePSCmdlet executeGetAzureVMImageCmd = new ExecutePSCmdlet();
+
+            string getAzureVMImageCmd = "Get-AzureVMImage";
+            executeGetAzureVMImageCmd.Execute(Resources.ExecutingGetAzureVMImage, getAzureVMImageCmd);
+            if (executeGetAzureVMImageCmd.ErrorOccurred == true)
+            {
+                throw new ApplicationFailedException(Resources.GetAzureVMImageFailed);
+            }
+
+            if (executeGetAzureVMImageCmd.OutputData != null)
+            {
+                foreach (PSObject eachImageDetails in executeGetAzureVMImageCmd.OutputData)
+                {
+                    PSPropertyInfo imageFamilyProperty = eachImageDetails.Properties["ImageFamily"];
+                    if ((imageFamilyProperty != null) && (imageFamilyProperty.Value != null) && 
+                        imageFamilyProperty.Value.ToString().Contains(Resources.Win2KR8SP1FamilyName) &&
+                        (eachImageDetails.Properties["ImageName"] != null) && (eachImageDetails.Properties["ImageName"].Value != null))
+                    {
+                        return eachImageDetails.Properties["ImageName"].Value.ToString();
+                    }
+                }
+            }
+
+            throw new ApplicationFailedException(string.Format(Resources.VMImageNotFoundFmt, Resources.Win2KR8SP1FamilyName));
+        }
+
     }
 }

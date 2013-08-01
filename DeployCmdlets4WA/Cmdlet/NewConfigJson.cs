@@ -49,7 +49,8 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private void WriteConfigJson()
         {
-            string[] jsonVals = new string[] { string.Format(CultureInfo.InvariantCulture, "{0}.cloudapp.net", Service), "Administrator", AdminPassword, _ports, _ipAddress, Service };
+            string[] jsonVals = new string[] { string.Format(CultureInfo.InvariantCulture, Utils.CloudAppURLFormat, Service),
+                "Administrator", AdminPassword, _ports, _ipAddress, Service };
             string contents = string.Format(CultureInfo.InvariantCulture, Resources.ConfigJson, jsonVals);
 
             File.WriteAllText("config.json", contents);

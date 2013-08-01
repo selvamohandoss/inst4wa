@@ -112,7 +112,6 @@
     <Compile Include="Cmdlet\NewConfigJson.cs" />
     <Compile Include="Cmdlet\CreateApplicationDirectoryCmdlet.cs" />
     <Compile Include="Cmdlet\NewAzureVMsFromImage.cs" />
-    <Compile Include="Cmdlet\NewWinRMEnabledAzureVMImage.cs" />
     <Compile Include="Cmdlet\GetAndUnzip.cs" />
     <Compile Include="Cmdlet\InvokeExecutable.cs" />
     <Compile Include="Cmdlet\InstallAzureSdkForNodeJS.cs" />
@@ -159,22 +158,19 @@
     <Compile Include="Utilities\Utils.cs" />
     <Compile Include="XmlSchema\DeploymentModel.cs" />
     <Compile Include="XmlSchema\PublishProfile.cs" />
+    <Compile Include="XmlSchema\PublishProfileV2.cs" />
     <Compile Include="XmlSchema\ServiceConfigurationSchema.cs" />
     <Compile Include="XmlSchema\ServiceDefinitionSchema.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\InstallNodeJSModules.ps1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\imagelocations.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\remote-setup.ps1">
