@@ -1,0 +1,85 @@
+<DeploymentModel  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!--
+      Test Command
+      Inst4WA.exe -XmlConfigPath "HelloWorldWorkerRoleWR.xml" -Subscription "<subscription name>" -DomainName "<domain name>" 
+  -->
+  <Parameters>
+    <Parameter Name="ServiceEnvironment" Value="AzureChinaCloud"></Parameter>
+    <Parameter Name="Emulator" Value="false"></Parameter>
+    <Parameter Name="Subscription" Value="" Required="yes"></Parameter>
+    <Parameter Name="DomainName" Value="HelloWorldWorkerRole" Required="yes"></Parameter>
+    <Parameter Name="StorageAccountName" ValuePrefixRef="DomainName" ValueSuffix="stg" Required="yes"></Parameter>
+    <Parameter Name="DeploymentName" ValuePrefixRef="DomainName" ValueSuffix="deploy" Required="yes"></Parameter>
+    <Parameter Name="Location" Value="" Required="yes"></Parameter>
+    <Parameter Name="DeploymentOption" Value="Production"></Parameter>
+    <Parameter Name="PublishSettingsFilePath" Value="Azure.publishsettings"></Parameter>
+
+    <Parameter Name="AppFolder" Value="C:\temp\WorkerRoleOnAzure"></Parameter>
+    <Parameter Name="AppName" Value="HelloWorld"></Parameter>
+
+    <Parameter Name="RoleBinaries" Value="TestData\WorkerRole\bin"></Parameter>
+    <Parameter Name="CSCFGFile" Value="TestData\WorkerRole\ServiceConfiguration.Local.cscfg"></Parameter>
+    <Parameter Name="CSDEFFile" Value="TestData\WorkerRole\ServiceDefinition.csdef"></Parameter>
+    
+    <Parameter Name="RoleName" Value="WorkerRole"></Parameter>
+    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
+  </Parameters>
+  <Steps>
+
+    <Step Type="Cmdlet" Command="Install-AzureSdkForNodeJs" Message="Installing Windows Azure PowerShell for Node.JS">
+      <CommandParam Name="AzureNodeSdkLoc" ParameterName="AzurePowershellManifest" />
+    </Step>
+
+    <!--Load Azure SDK Dll's-->
+    <Step Type="Cmdlet" Command="Import-Module" Message="Importing Azure Powershell Modules">
+      <CommandParam Name="Name" ParameterName="AzurePowershellManifest" />
+      <CommandParam Name="NoClobber" ParameterName="" />
+    </Step>
+    
+    <Step Type="Cmdlet" Command="Import-AzurePublishSettingsFile" Message="Importing Publish settings">
+      <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />
+    </Step>
+    <Step Type="Cmdlet" Command="Set-AzureSubscription" Message="Configuring default Subscription">
+      <CommandParam Name="DefaultSubscription" ParameterName="Subscription"></CommandParam>
+    </Step>
+    
+    <!--Create Empty App-->
+    <Step Type="Cmdlet" Command="New-ApplicationDirectory" Message="Creating application directory">
+      <CommandParam Name="AppFolder" ParameterName="AppFolder" />
+    </Step>
+    <Step Message="Changing to application directory" Command="" Type="ChangeWorkingDir">
+      <CommandParam Name="WorkingDir" ParameterName="AppFolder"/>
+    </Step>
+    <Step Message="Creating new Azure service" Command="New-AzureServiceProject" Type="Cmdlet">
+      <CommandParam Name="ServiceName" ParameterName="AppName"/>
+    </Step>
+
+    <!--Create Worker Role-->
+    <Step Type="Cmdlet" Command="Add-AzureWorkerRole" Message="Creating hello world worker role.">
+      <CommandParam Name="RoleBinariesFolder" ParameterName="RoleBinaries" />
+      <CommandParam Name="CSCFGFile" ParameterName="CSCFGFile" />
+      <CommandParam Name="CSDEFFile" ParameterName="CSDEFFile" />
+      <CommandParam Name="RoleName" ParameterName="RoleName" />
+    </Step>
+
+    <!--Configure storage account and deploy-->
+    <Step Type="Cmdlet" Command="Set-AzureStorageAccountEx" Message="Configuring azure storage account">
+      <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />
+      <CommandParam Name="Subscription" ParameterName="Subscription" />
+      <CommandParam Name="StorageAccount" ParameterName="StorageAccountName" />
+      <CommandParam Name="Location" ParameterName="Location" />
+    </Step>
+    <Step Type="Cmdlet" Command="Publish-AzureServiceProject -launch" Message="Deploying the app to Azure">
+      <CommandParam Name="ServiceName" ParameterName="DeploymentName" />
+      <CommandParam Name="StorageAccountName" ParameterName="StorageAccountName" />
+      <CommandParam Name="Slot" ParameterName="DeploymentOption" />
+      <CommandParam Name="Location" ParameterName="Location" />
+    </Step>
+    <Step Type="Cmdlet" Command="Ping-ServiceEndpoints" Message="Verifying the Endpoints.">
+      <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />
+      <CommandParam Name="Subscription" ParameterName="Subscription" />
+      <CommandParam Name="ServiceName" ParameterName="DeploymentName" />
+    </Step>
+  </Steps>
+</DeploymentModel>

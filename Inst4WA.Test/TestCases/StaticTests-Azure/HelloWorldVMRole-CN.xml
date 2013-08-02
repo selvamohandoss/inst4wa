@@ -1,0 +1,135 @@
+<DeploymentModel  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Parameters>
+
+    <Parameter Name="ServiceEnvironment" Value="AzureChinaCloud"></Parameter>
+    <Parameter Name="DomainName" Value="" Required="yes"></Parameter>
+    <Parameter Name="StorageAccount" ValuePrefixRef="DomainName" ValueSuffix="stg" Required="yes"></Parameter>
+    <Parameter Name="Service" ValuePrefixRef="DomainName" ValueSuffix="deploy" Required="yes"></Parameter>
+
+    <Parameter Name="Subscription" Value="" Required="yes"></Parameter>
+
+    <Parameter Name="Emulator" Value="false"></Parameter>
+    <Parameter Name="Location" Value="" Required="yes"></Parameter>
+    <Parameter Name="LocationXml" Value="imagelocations.xml"></Parameter>
+
+    <Parameter Name="PublishSettingsFile" Value="Azure.publishsettings"></Parameter>
+
+    <!-- Setting the VMCount to 1 here to keep deployment cost minimum. -->
+    <Parameter Name="VMCount" Value="1"></Parameter>
+    
+    <Parameter Name="VMNamePrefix" ValuePrefixRef="DomainName" ValueSuffix="vm" Required="yes"></Parameter>
+    <Parameter Name="AdminPassword" Value="" Required="yes"></Parameter>
+    <Parameter Name="AdminUserName" Value="" Required="yes"></Parameter>
+    <Parameter Name="Force" Value="" Required="yes"></Parameter>
+    
+    <Parameter Name="OSSEPName" Value="ossep"></Parameter>
+    <Parameter Name="PrivatePortForOSS" Value="80"></Parameter>
+    <Parameter Name="PublicPortForOSS" Value="80"></Parameter>
+    <Parameter Name="OSSEPProtocol" Value="tcp"></Parameter>
+
+    <Parameter Name="WinRMEPName" Value="winrmep"></Parameter>
+    <Parameter Name="PrivatePortForWinRM" Value="5985"></Parameter>
+    <Parameter Name="PublicPortOffsetForWinRM" Value="5985"></Parameter>
+    <Parameter Name="WinRMEPProtocol" Value="tcp"></Parameter>
+
+    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
+    <Parameter Name="PublishSettingsFilePath" Value="Azure.publishsettings"></Parameter>
+    <Parameter Name="OSSInstallScript" Value="TestData\VMRole\enable-web-server.ps1"></Parameter>
+
+    <Parameter Name="ExecutionPolicy" Value="Unrestricted"></Parameter>
+    <Parameter Name="Scope" Value="Process"></Parameter>
+  </Parameters>
+  <Steps>
+
+    <Step Type="Cmdlet" Command="Set-ExecutionPolicy" Message="Enabling execution of PS1 on local machine.">
+      <CommandParam Name="ExecutionPolicy" ParameterName="ExecutionPolicy" />
+      <CommandParam Name="Scope" ParameterName="Scope" />
+      <CommandParam Name="Force" ParameterName=""/>
+    </Step>
+
+    <!--Install Windows Azure SDK and load the assemblies-->
+    <Step Type="Cmdlet" Command="Install-AzureSdkForNodeJs" Message="Installing Windows Azure PowerShell for Node.JS">
+      <CommandParam Name="AzureNodeSdkLoc" ParameterName="AzurePowershellManifest" />
+    </Step>
+
+    <!--Load Azure SDK Dll's-->
+    <Step Type="Cmdlet" Command="Import-Module" Message="Importing Azure Powershell Modules">
+      <CommandParam Name="Name" ParameterName="AzurePowershellManifest" />
+      <CommandParam Name="NoClobber" ParameterName="" />
+    </Step>
+    
+    <!--Import Publish Settings file-->
+    <Step Type="Cmdlet" Command="Import-AzurePublishSettingsFile" Message="Importing Publish settings">
+      <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />
+    </Step>
+    <Step Type="Cmdlet" Command="Set-AzureSubscription" Message="Configuring default Subscription">
+      <CommandParam Name="DefaultSubscription" ParameterName="Subscription"></CommandParam>
+    </Step>
+
+    <!--Create storage account and set it as default one-->
+    <Step Type="Cmdlet" Command="Set-AzureStorageAccountEx" Message="Creating Azure storage account if it does not exist.">
+      <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath"/>
+      <CommandParam Name="Subscription" ParameterName="Subscription"/>
+      <CommandParam Name="StorageAccount" ParameterName="StorageAccount"/>
+      <CommandParam Name="Location" ParameterName="Location"/>
+      <CommandParam Name="CreateOnly" ParameterName=""/>
+      <CommandParam Name="SetDefault" ParameterName=""/>
+    </Step>
+    
+    <!--Enable WinRM-->
+    <Step Type="Cmdlet" Command="Enable-WinRM" Message="Enabling WinRM on local machine">
+    </Step>
+
+    <!--Create VM-->
+    <Step Type="Cmdlet" Command="New-AzureVMsFromImage" Message="Creating VM's from VM Image">
+      <CommandParam Name="Count" ParameterName="VMCount"  />
+      <CommandParam Name="Service" ParameterName="Service"  />
+      <CommandParam Name="Location" ParameterName="Location"  />
+      <CommandParam Name="VMNamePrefix" ParameterName="VMNamePrefix"  />
+      <CommandParam Name="AdminUsername" ParameterName="AdminUsername"  />
+      <CommandParam Name="AdminPassword" ParameterName="AdminPassword"  />
+      <CommandParam Name="Force" ParameterName="Force"  />
+    </Step>
+
+    <!--Add OSS EndPoints.-->
+    <Step Type="Cmdlet" Command="Add-Endpoints" Message="Adding OSS EndPoints">
+      <CommandParam Name="Count" ParameterName="VMCount"  />
+      <CommandParam Name="Service" ParameterName="Service"  />
+      <CommandParam Name="VMNamePrefix" ParameterName="VMNamePrefix"  />
+      <CommandParam Name="PrivatePort" ParameterName="PrivatePortForOSS"  />
+      <CommandParam Name="PublicPort" ParameterName="PublicPortForOSS"  />
+      <CommandParam Name="Protocol" ParameterName="OSSEPProtocol"  />
+      <CommandParam Name="EndPointName" ParameterName="OSSEPName"  />
+      <CommandParam Name="LoadBalance" ParameterName=""/>
+    </Step>
+
+    <!--Add WinRM EndPoints-->
+    <Step Type="Cmdlet" Command="Add-Endpoints" Message="Adding WinRM EndPoints">
+      <CommandParam Name="Count" ParameterName="VMCount"  />
+      <CommandParam Name="Service" ParameterName="Service"  />
+      <CommandParam Name="VMNamePrefix" ParameterName="VMNamePrefix"  />
+      <CommandParam Name="PrivatePort" ParameterName="PrivatePortForWinRM"  />
+      <CommandParam Name="PublicPort" ParameterName="PublicPortOffsetForWinRM"  />
+      <CommandParam Name="Protocol" ParameterName="WinRMEPProtocol"  />
+      <CommandParam Name="EndPointName" ParameterName="WinRMEPName"  />
+    </Step>
+
+    <!--Note: Following steps will probably need to be customized for each OSS depending upon how it is installed and initialized-->
+    <!--Here, we are providing just a sample scenario where we simply enable the Web server role on the VM and test that we can ping the corresponding port-->
+    <!--Execute remote-setup.ps1, which in turn executes the OSSInstallScript-->
+    <Step Type="PS1" Command="remote-setup.ps1" Message ="Remotely Enabling Web Role on VMs">
+      <CommandParam Name="" ParameterName="OSSInstallScript" />
+      <CommandParam Name="" ParameterName="Service"  />
+      <CommandParam Name="" ParameterName="AdminUserName"  />
+      <CommandParam Name="" ParameterName="AdminPassword"  />
+      <CommandParam Name="" ParameterName="WinRMEPName"  />
+    </Step>
+
+    <Step Type="Cmdlet" Command="Ping-ServiceEndpoints" Message="Verifying the Endpoints.">
+      <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFile"  />
+      <CommandParam Name="Subscription" ParameterName="Subscription" />
+      <CommandParam Name="ServiceName" ParameterName="Service" />
+    </Step>
+
+  </Steps>
+</DeploymentModel>
