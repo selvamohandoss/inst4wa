@@ -31,7 +31,6 @@ namespace DeployCmdlets4WA.ServiceProxy
 {
     public static class ConfigurationConstants
     {
-        public const string ServiceManagementEndpoint = "https://management.core.windows.net";
         public const string ServiceManagementNamespace = "http://schemas.microsoft.com/windowsazure";
 
         public static Binding WebHttpBinding(int maxStringContentLength)

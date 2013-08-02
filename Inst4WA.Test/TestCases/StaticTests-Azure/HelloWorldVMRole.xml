@@ -8,13 +8,12 @@
     <Parameter Name="Subscription" Value="" Required="yes"></Parameter>
 
     <Parameter Name="Emulator" Value="false"></Parameter>
-    <Parameter Name="ImageName" ValuePrefixRef="DomainName" ValueSuffix="WIN2K8-R2-WINRM"></Parameter>
     <Parameter Name="Location" Value="" Required="yes"></Parameter>
     <Parameter Name="LocationXml" Value="imagelocations.xml"></Parameter>
 
     <Parameter Name="PublishSettingsFile" Value="Azure.publishsettings"></Parameter>
 
-    <!-- Setting the VMCount to 1 temporarily until Azure SDK bug involving multiple VM's is fixed. -->
+    <!-- Setting the VMCount to 1 here to keep deployment cost minimum. -->
     <Parameter Name="VMCount" Value="1"></Parameter>
     
     <Parameter Name="VMNamePrefix" ValuePrefixRef="DomainName" ValueSuffix="vm" Required="yes"></Parameter>
@@ -67,7 +66,7 @@
     </Step>
 
     <!--Create storage account and set it as default one-->
-    <Step Type="Cmdlet" Command="Set-AzureStorageAccountEx" Message="Creating Azure storage account if it does not exists.">
+    <Step Type="Cmdlet" Command="Set-AzureStorageAccountEx" Message="Creating Azure storage account if it does not exist.">
       <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath"/>
       <CommandParam Name="Subscription" ParameterName="Subscription"/>
       <CommandParam Name="StorageAccount" ParameterName="StorageAccount"/>
@@ -80,21 +79,9 @@
     <Step Type="Cmdlet" Command="Enable-WinRM" Message="Enabling WinRM on local machine">
     </Step>
 
-    <!--Create VM Image-->
-    <Step Type="Cmdlet" Command="New-WinRMEnabledAzureVMImage" Message="Creating VM Image">
-      <CommandParam Name="Location" ParameterName="Location"  />
-      <CommandParam Name="LocationXml" ParameterName="LocationXml"  />
-      <CommandParam Name="ImageName" ParameterName="ImageName"  />
-      <CommandParam Name="Subscription" ParameterName="Subscription"  />
-      <CommandParam Name="StorageAccount" ParameterName="StorageAccount"  />
-      <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFile"  />
-      <!--<CommandParam Name="Container" ParameterName="Container"  />-->
-    </Step>
-
     <!--Create VM-->
     <Step Type="Cmdlet" Command="New-AzureVMsFromImage" Message="Creating VM's from VM Image">
       <CommandParam Name="Count" ParameterName="VMCount"  />
-      <CommandParam Name="ImageName" ParameterName="ImageName"  />
       <CommandParam Name="Service" ParameterName="Service"  />
       <CommandParam Name="Location" ParameterName="Location"  />
       <CommandParam Name="VMNamePrefix" ParameterName="VMNamePrefix"  />

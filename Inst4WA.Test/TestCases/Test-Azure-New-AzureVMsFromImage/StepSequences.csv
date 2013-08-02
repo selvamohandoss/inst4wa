@@ -1,2 +1,2 @@
-Command,Command,Command,Command,Command,Command,Commad
-Cmdlet:Install-AzureSdkForNodeJs,Cmdlet:Import-Module,Cmdlet:Import-AzurePublishSettingsFile,Cmdlet:Set-AzureSubscription,Cmdlet:Set-AzureStorageAccountEx,Cmdlet:New-WinRMEnabledAzureVMImage,Cmdlet:New-AzureVMsFromImage
+Command,Command,Command,Command,Command,Commad
+Cmdlet:Install-AzureSdkForNodeJs,Cmdlet:Import-Module,Cmdlet:Import-AzurePublishSettingsFile,Cmdlet:Set-AzureSubscription,Cmdlet:Set-AzureStorageAccountEx,Cmdlet:New-AzureVMsFromImage

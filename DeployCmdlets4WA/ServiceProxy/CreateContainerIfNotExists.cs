@@ -16,7 +16,8 @@ namespace DeployCmdlets4WA.ServiceProxy
 
         public static void CreateIfNotExists(string containerName, string accountName, string accountKey)
         {
-            string containerUrl = string.Format(CultureInfo.InvariantCulture, "http://{0}.blob.core.windows.net/{1}?restype=container", accountName, containerName.ToLowerInvariant());
+            string containerUrl = string.Format(CultureInfo.InvariantCulture, Utilities.Utils.ContainerURLFormat,
+                accountName, containerName.ToLowerInvariant());
             Uri containerUri = new Uri(containerUrl);
 
             HttpWebRequest request = CreateRequest(containerUri);

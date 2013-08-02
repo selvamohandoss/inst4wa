@@ -40,9 +40,9 @@ namespace DeployCmdlets4WA.Cmdlet
     [Cmdlet(VerbsDiagnostic.Ping, "ServiceEndpoints")]
     public class PingServiceEndpoints : PSCmdlet
     {
-        private PublishDataPublishProfile _publishProfile;
         private X509Certificate2 _cert;
         private string _subscriptionId;
+        private string _serviceMgmtUrl;
 
         [Parameter(Mandatory = true, HelpMessage = "Path to the publish settings file.")]
         [ValidateNotNullOrEmpty]
@@ -62,7 +62,7 @@ namespace DeployCmdlets4WA.Cmdlet
 
             base.ProcessRecord();
 
-            Utils.InitPublishSettings(PublishSettingsFile, Subscription, out _publishProfile, out _cert, out _subscriptionId);
+            Utils.InitPublishSettings(PublishSettingsFile, Subscription, out _cert, out _subscriptionId, out _serviceMgmtUrl);
 
             List<IPEndPoint> serviceEndpoints = GetServiceEndpoints();
             PingEndPoints(serviceEndpoints);
@@ -133,7 +133,7 @@ namespace DeployCmdlets4WA.Cmdlet
                     }
                     catch (Exception ex)
                     {
-                        if (retryCountForEndpoint == maxRetryCount)
+                        if (retryCountForEndpoint <= maxRetryCount)
                         {
                             WriteObject(Resources.VerificationFailedRetry);
                             System.Threading.Thread.Sleep(5000); //Wait for 5 Seconds before trying again.

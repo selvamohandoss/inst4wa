@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Web;
+using DeployCmdlets4WA.Utilities;
 
 namespace DeployCmdlets4WA.ServiceProxy
 {
@@ -37,7 +38,7 @@ namespace DeployCmdlets4WA.ServiceProxy
             WebChannelFactory<IServiceManagement> factory = new WebChannelFactory<IServiceManagement>
                 (
                     ConfigurationConstants.WebHttpBinding(0),
-                    new Uri(ConfigurationConstants.ServiceManagementEndpoint)
+                    new Uri(Utils.ServiceManagementEndpoint)
                 );
             factory.Endpoint.Behaviors.Add(messageInspector);
             factory.Credentials.ClientCertificate.Certificate = authCert;

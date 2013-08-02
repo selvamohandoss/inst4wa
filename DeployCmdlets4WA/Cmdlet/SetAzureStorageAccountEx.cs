@@ -44,8 +44,8 @@ namespace DeployCmdlets4WA.Cmdlet
     public class SetAzureStorageAccountEx : PSCmdlet
     {
         private string _storageAccount;
+        private string _serviceMgmtUrl;
 
-        private PublishDataPublishProfile _publishProfile;
         private X509Certificate2 _cert;
         private string _subscriptionId;
 
@@ -94,8 +94,9 @@ namespace DeployCmdlets4WA.Cmdlet
 
             base.ProcessRecord();
 
-            Utils.InitPublishSettings(PublishSettingsFile, Subscription, out _publishProfile, out _cert, out _subscriptionId);
-            
+            Utils.InitPublishSettings(PublishSettingsFile, Subscription, out _cert, out _subscriptionId, out _serviceMgmtUrl);
+            Utils.EnsureSameEnvironment(_serviceMgmtUrl);
+
             SetStorageAccount();
         }
 

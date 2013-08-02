@@ -5,8 +5,6 @@ PublishSettingsFilePath,Azure.publishsettings,NO,,,FALSE,FALSE
 StorageAccount,,NO,DomainName,stg,FALSE,FALSE
 StorageAccountLocation,West US,NO,,,FALSE,FALSE
 Location,West US,NO,,,FALSE,FALSE
-LocationXml,imagelocations.xml,NO,,,FALSE,FALSE
-ImageName,,NO,DomainName,WIN2K8-R2-WINRM,FALSE,FALSE
 VMImageName,,NO,DomainName,WIN2K8-R2-WINRM,FALSE,FALSE
 VMImageName,NonExistingImage,NO,,,TRUE,FALSE
 DomainName,,YES,,,FALSE,TRUE
@@ -20,3 +18,4 @@ AdminPassword,p@ssw0rd000,NO,,,FALSE,FALSE
 AdminPassword,p,NO,,,TRUE,FALSE
 VMLocation,West US,NO,,,FALSE,FALSE
 Force,TRUE,NO,,,FALSE,FALSE
+AdminUsername,,YES,DomainName,admin,FALSE,FALSE
