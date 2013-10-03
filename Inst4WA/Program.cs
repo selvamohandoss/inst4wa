@@ -138,13 +138,34 @@ namespace Inst4WA
 
         private static int GetPowershellVersion()
         {
-            if ((string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine", "PowerShellVersion", null) == "3.0")
-                return 3;
-            
-            if ((string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\PowerShellEngine", "PowerShellVersion", null) == "2.0")
-                return 2;
+            String commandOutput = string.Empty;
+            using (Process p = new Process())
+            {
+                p.StartInfo.FileName = "Powershell.exe";
+                p.StartInfo.Arguments = String.Format("-Command $host.Version.Major");
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                p.StartInfo.Verb = "runas";
+                p.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                {
+                    commandOutput = string.Concat(commandOutput, e.Data);
+                };
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.RedirectStandardInput = true;
+                p.Start();
+                p.BeginOutputReadLine();
+                p.WaitForExit();
+                p.Close();
 
-            return -1;
+                int powershellMajorVersion = -1;
+                commandOutput.Trim();
+                if (int.TryParse(commandOutput, out powershellMajorVersion) == true)
+                {
+                    Console.WriteLine("Powershell Major version : " + powershellMajorVersion);
+                }
+                return powershellMajorVersion;
+            }
         }
 
         private static void RevertConfigChanges(string configFileLoc)

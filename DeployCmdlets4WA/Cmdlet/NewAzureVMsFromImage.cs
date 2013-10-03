@@ -373,9 +373,17 @@ namespace DeployCmdlets4WA.Cmdlet
                 foreach (PSObject eachImageDetails in executeGetAzureVMImageCmd.OutputData)
                 {
                     PSPropertyInfo imageFamilyProperty = eachImageDetails.Properties["ImageFamily"];
-                    if ((imageFamilyProperty != null) && (imageFamilyProperty.Value != null) && 
+                    PSPropertyInfo imageLocationProperty = eachImageDetails.Properties["Location"];
+                    if ((imageFamilyProperty != null) && 
+                        (imageFamilyProperty.Value != null) &&
                         imageFamilyProperty.Value.ToString().Contains(Resources.Win2KR8SP1FamilyName) &&
-                        (eachImageDetails.Properties["ImageName"] != null) && (eachImageDetails.Properties["ImageName"].Value != null))
+                        //Check if location is not null
+                        (imageLocationProperty != null) && 
+                        (imageLocationProperty.Value != null) &&
+                        //Check if image is present at the location where deployment is being created.
+                        (imageLocationProperty.Value.ToString().ToLowerInvariant().Contains(this.Location.ToLowerInvariant()) == true) && 
+                        (eachImageDetails.Properties["ImageName"] != null) && 
+                        (eachImageDetails.Properties["ImageName"].Value != null))
                     {
                         return eachImageDetails.Properties["ImageName"].Value.ToString();
                     }

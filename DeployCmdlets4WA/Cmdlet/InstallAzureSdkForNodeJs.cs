@@ -78,7 +78,7 @@ namespace DeployCmdlets4WA.Cmdlet
             FileStream logFileFs = File.Create(logFileName);
             logFileFs.Close();
 
-            String installCommand = String.Format(CultureInfo.InvariantCulture, "Start-Process -File \"{0}\" -ArgumentList \" /Install /Products:AzureNodeSDK,AzureNodePowershell,WindowsAzurePowershell /Log:{1} /AcceptEULA \" -Wait", pathToWebPIExe, logFileName);
+            String installCommand = String.Format(CultureInfo.InvariantCulture, "Start-Process -File \"{0}\" -ArgumentList \" /Install /Products:WindowsAzurePowershell /Log:{1} /AcceptEULA \" -Wait", pathToWebPIExe, logFileName);
             ExecuteCommands.ExecuteCommand(installCommand, this.Host);
             return logFileName;
         }
