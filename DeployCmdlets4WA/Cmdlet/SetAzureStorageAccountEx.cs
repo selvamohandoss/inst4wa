@@ -169,8 +169,8 @@ namespace DeployCmdlets4WA.Cmdlet
             string httpUrlformatBasedOnEnv = Utils.IsChinaCloud == false ? cloudStorageFormat : cloudStorageFormatCnHttp;
             string httpsUrlformatBasedOnEnv = Utils.IsChinaCloud == false ? cloudStorageFormat : cloudStorageFormatCnHttps;
 
-            string storageHttpKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormatCnHttp, "http", this.StorageAccount, primaryKey);
-            string storageHttpsKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormatCnHttps, "https", this.StorageAccount, primaryKey);
+            string storageHttpKey = string.Format(CultureInfo.InvariantCulture, httpUrlformatBasedOnEnv, "http", this.StorageAccount, primaryKey);
+            string storageHttpsKey = string.Format(CultureInfo.InvariantCulture, httpsUrlformatBasedOnEnv, "https", this.StorageAccount, primaryKey);
 
             for (int i = 0; i < config.Role.Length; i++)
             {
