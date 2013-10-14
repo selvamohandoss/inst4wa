@@ -157,8 +157,20 @@ namespace DeployCmdlets4WA.Cmdlet
         private void ConfigureRoleStorageAccountKeys(ServiceConfigurationSchema.ServiceConfiguration config, string primaryKey)
         {
             string cloudStorageFormat = "DefaultEndpointsProtocol={0};AccountName={1};AccountKey={2}";
-            string storageHttpKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormat, "http", this.StorageAccount, primaryKey);
-            string storageHttpsKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormat, "https", this.StorageAccount, primaryKey);
+            string cloudStorageFormatCnHttp = "DefaultEndpointsProtocol={0};AccountName={1};AccountKey={2};" +
+                                          "BlobEndpoint=http://{1}.blob.core.chinacloudapi.cn/;" +
+                                          "QueueEndpoint=http://{1}.queue.core.chinacloudapi.cn/;" + 
+                                          "TableEndpoint=http://{1}.table.core.chinacloudapi.cn/";
+            string cloudStorageFormatCnHttps = "DefaultEndpointsProtocol={0};AccountName={1};AccountKey={2};" +
+                                          "BlobEndpoint=https://{1}.blob.core.chinacloudapi.cn/;" +
+                                          "QueueEndpoint=https://{1}.queue.core.chinacloudapi.cn/;" +
+                                          "TableEndpoint=https://{1}.table.core.chinacloudapi.cn/";
+            
+            string httpUrlformatBasedOnEnv = Utils.IsChinaCloud == false ? cloudStorageFormat : cloudStorageFormatCnHttp;
+            string httpsUrlformatBasedOnEnv = Utils.IsChinaCloud == false ? cloudStorageFormat : cloudStorageFormatCnHttps;
+
+            string storageHttpKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormatCnHttp, "http", this.StorageAccount, primaryKey);
+            string storageHttpsKey = string.Format(CultureInfo.InvariantCulture, cloudStorageFormatCnHttps, "https", this.StorageAccount, primaryKey);
 
             for (int i = 0; i < config.Role.Length; i++)
             {

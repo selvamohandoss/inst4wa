@@ -38,15 +38,24 @@ namespace DeployCmdlets4WA.Utilities
 {
     public static class Utils
     {
+        private const string azureCloudName = "AzureCloud";
         private static string ServiceEnvironment;
         private static bool IsIaaS;
         public static string CloudAppURLFormat, VHDURLFormat, PublishSettingsURL, ContainerURLFormat, ServiceManagementEndpoint;
+
+        public static bool IsChinaCloud
+        {
+            get 
+            {
+                return ServiceEnvironment.ToUpperInvariant() != azureCloudName.ToUpperInvariant();
+            }
+        }
 
         public static void Init(string serviceEnvironment, string serviceModel)
         {
             // determine Azure service environment
             if (string.IsNullOrEmpty(serviceEnvironment))
-                ServiceEnvironment = "AzureCloud";
+                ServiceEnvironment = azureCloudName;
             else
                 ServiceEnvironment = serviceEnvironment;
 
