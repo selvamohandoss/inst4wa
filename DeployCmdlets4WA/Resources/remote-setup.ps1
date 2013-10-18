@@ -72,7 +72,6 @@ function get-Config([string]$service, [string]$adminUsername, [string]$adminPass
    
         [hashtable]$result = @{} 
         $result.dnsPrefix = $service
-        $result.dns = $service + ".cloudapp.net"
         $result.user = $adminUsername
         $result.password = $adminPassword
        
@@ -85,7 +84,8 @@ function get-Config([string]$service, [string]$adminUsername, [string]$adminPass
         {
             Throw "Unable to get VM details."
         }
-
+        $result.dns = (Get-AzureVM -ServiceName $service -name $vmDetails[0].InstanceName).DNSName
+        Write-Host "DNS Name : " $result.dns
         $endpointSearchCriteria = "*" + $winrmEpName + "*"
 
         foreach($eachVmDetail in $vmDetails)
@@ -108,9 +108,11 @@ $cred = New-Object System.Management.Automation.PSCredential ($result.Get_Item("
 # After VM's are in ready state it takes some time to reach the VM in a state in which
 # it can accept the request, so waiting for 30 seconds
 Start-Sleep -s 30
+$ctr = 0
+$ipAddresses = $result.Get_Item("ips")
 # Runs the remote setup script in each VM, do retry if the connection fails.
 foreach ($port in $result.Get_Item("ports")) {
-  logStatus ("Running setup on " + $result.Get_Item("dns") + ":" + $port)
+  logStatus ("Running setup on " + $ipAddresses + ":" + $port)
   $retry = 0;
   do {
     $success = $false;
@@ -122,8 +124,10 @@ foreach ($port in $result.Get_Item("ports")) {
         if($args.Count -gt 5){
             $argumentsForOSSScript += $args[5];
         }
-        Invoke-Command -ComputerName $result.Get_Item("dns") -Port $port -Credential $cred -FilePath $args[0] -ArgumentList $argumentsForOSSScript  -ErrorAction Stop
+        Invoke-Command -ComputerName $ipAddresses[$ctr] -Port $port -Credential $cred -FilePath $args[0] -ArgumentList $argumentsForOSSScript  -ErrorAction Stop
         $success = $true
+        $ctr += 1
+
     }
     catch [Exception]
     {
