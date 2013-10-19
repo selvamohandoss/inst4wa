@@ -92,7 +92,7 @@ function get-Config([string]$service, [string]$adminUsername, [string]$adminPass
         {
             $endpoints = @(Get-AzureVM -ServiceName $service -name $eachVmDetail.Name | Get-AzureEndPoint | where-object {$_.Name -like $endpointSearchCriteria })
             $result.ports += $endpoints[0].Port
-            $result.ips += $eachVmDetail.IpAddress
+            $result.ips += $endpoints[0].Vip
         }
         
         return $result;
