@@ -44,12 +44,12 @@ namespace DeployCmdlets4WA.Utilities
         {
             try
             {
-                using (WebClient setupDownloader = new WebClient())
+                using (ExtendedWebClient setupDownloader = new ExtendedWebClient())
                 {
                     setupDownloader.DownloadProgressChanged += new DownloadProgressChangedEventHandler(setupDownloader_DownloadProgressChanged);
                     setupDownloader.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(setupDownloader_DownloadFileCompleted);
                     setupDownloader.DownloadFileAsync(url, saveLoc);
-
+                    
                     Console.WriteLine("Downloading setup - ");
                     threadBlocker = new AutoResetEvent(false);
                     threadBlocker.WaitOne();

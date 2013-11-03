@@ -40,8 +40,8 @@
     <Step Type="Cmdlet" Command="Import-AzurePublishSettingsFile" Message="Importing Publish settings">
       <CommandParam Name="PublishSettingsFile" ParameterName="PublishSettingsFilePath" />
     </Step>
-    <Step Type="Cmdlet" Command="Set-AzureSubscription" Message="Configuring default Subscription">
-      <CommandParam Name="DefaultSubscription" ParameterName="Subscription"></CommandParam>
+    <Step Type="Cmdlet" Command="Select-AzureSubscription" Message="Configuring default Subscription">
+      <CommandParam Name="Default" ParameterName="Subscription"></CommandParam>
     </Step>
     
     <!--Create Empty App-->

@@ -31,6 +31,7 @@ using System.IO;
 using System.Net;
 using DeployCmdlets4WA.Properties;
 using System.Globalization;
+using DeployCmdlets4WA.Utilities;
 
 namespace DeployCmdlets4WA.Cmdlet
 {
@@ -49,6 +50,9 @@ namespace DeployCmdlets4WA.Cmdlet
 
         [Parameter(Mandatory = false, HelpMessage = "Provide the location of file that should be verified to confirm the execution success.")]
         public string CheckFile { get; set; }
+
+        [Parameter(Mandatory = false, HelpMessage = "Number of times command should try to download the file from specified URL.")]
+        public int RetryCount { get; set; }
 
         protected override void ProcessRecord()
         {
@@ -121,44 +125,38 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private string Download()
         {
-            try
+            if (RetryCount == 0)
             {
-                String tempLocationToSave = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + Path.GetExtension(DownloadLoc));
-                using (WebClient setupDownloader = new WebClient())
+                RetryCount = 3; //Try 3 times before giving up if not specified.
+            }
+            String tempLocation = String.Empty;
+            int tryCount = 0;
+            while (tryCount < RetryCount)
+            {
+                try
                 {
-                    setupDownloader.DownloadProgressChanged += new DownloadProgressChangedEventHandler(setupDownloader_DownloadProgressChanged);
-                    setupDownloader.DownloadFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(setupDownloader_DownloadFileCompleted);
-                    setupDownloader.DownloadFileAsync(new Uri(DownloadLoc), tempLocationToSave);
-
-                    Console.Write("Downloading setup - ");
-                    threadBlocker = new AutoResetEvent(false);
-                    threadBlocker.WaitOne();
+                    tempLocation = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + Path.GetExtension(DownloadLoc.ToString()));
+                    using (DownloadHelper helper = new DownloadHelper())
+                    {
+                        helper.Download(new Uri(DownloadLoc), tempLocation);
+                    }
+                    break;
                 }
-                return tempLocationToSave;
-            }
-            finally
-            {
-                if (threadBlocker != null) 
-                { 
-                    threadBlocker.Close();
-                    threadBlocker = null;
+                catch (Exception ex)
+                {
+                    tryCount++;
+                    if (tryCount < RetryCount == false)
+                    {
+                        throw ex;
+                    }
+                    else
+                    {
+                        String errorMessage = String.Format(CultureInfo.InvariantCulture, "Retry count - {0}. Error downloading the file - {1}", tryCount, ex.Message);
+                        Console.WriteLine(errorMessage);
+                    }
                 }
             }
-        }
-
-        private void setupDownloader_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            if ((e.ProgressPercentage % 10 == 0) && (e.ProgressPercentage > downloadProgress))
-            {
-                downloadProgress = e.ProgressPercentage;
-                Console.Write(String.Concat(" ", e.ProgressPercentage, "%"));
-            }
-        }
-
-        private void setupDownloader_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            Console.WriteLine(String.Empty);
-            threadBlocker.Set();
+            return tempLocation;
         }
 
         private void Install(string downloadLocation)

@@ -44,6 +44,9 @@ namespace DeployCmdlets4WA.Cmdlet
         [ValidateNotNullOrEmpty]
         public string UnzipLoc { get; set; }
 
+        [Parameter(Mandatory = false, HelpMessage = "Number of times command should try to download the file from specified URL.")]
+        public int RetryCount { get; set; }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
@@ -72,11 +75,37 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private string Download()
         {
-            String tempLocation = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + Path.GetExtension(Url.ToString()));
-
-            DownloadHelper helper = new DownloadHelper();
-            helper.Download(new Uri(Url), tempLocation);
-
+            if (RetryCount == 0)
+            {
+                RetryCount = 3; //Try 3 times before giving up if not specified.
+            }
+            String tempLocation = String.Empty;
+            int tryCount = 0;
+            while (tryCount < RetryCount)
+            {
+                try
+                {
+                    tempLocation = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + Path.GetExtension(Url.ToString()));
+                    using (DownloadHelper helper = new DownloadHelper())
+                    {
+                        helper.Download(new Uri(Url), tempLocation);
+                    }
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    tryCount++;
+                    if (tryCount < RetryCount == false)
+                    {
+                        throw ex;
+                    }
+                    else
+                    {
+                        String errorMessage = String.Format(CultureInfo.InvariantCulture, "Retry count - {0}. Error downloading the file - {1}", tryCount, ex.Message);
+                        Console.WriteLine(errorMessage);
+                    }
+                }
+            }
             return tempLocation;
         }
 

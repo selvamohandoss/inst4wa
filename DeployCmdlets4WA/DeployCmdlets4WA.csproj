@@ -154,7 +154,11 @@
     <Compile Include="Utilities\ExecuteCommands.cs" />
     <Compile Include="Utilities\ExecutePSCmdlet.cs" />
     <Compile Include="ServiceProxy\GetBlobProperties.cs" />
+    <Compile Include="Utilities\ExtendedWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Utilities\GlobalSuppressions.cs" />
+    <Compile Include="Utilities\OSBitness.cs" />
     <Compile Include="Utilities\Utils.cs" />
     <Compile Include="XmlSchema\DeploymentModel.cs" />
     <Compile Include="XmlSchema\PublishProfile.cs" />

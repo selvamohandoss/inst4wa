@@ -62,7 +62,8 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private void AddLBEndPointsToVMs(string[] vmNames)
         {
-            string cmdTemplate = "Get-AzureVM -ServiceName \"{0}\" -Name \"{1}\" | Add-AzureEndpoint -LBSetName \"{2}\" -Name \"{2}\" -ProbeProtocol \"{3}\"  -Protocol \"{3}\" -PublicPort {4} -ProbePort {4} -LocalPort {5} | Update-AzureVM";
+            string cmdTemplate = "Get-AzureVM -ServiceName \"{0}\" -Name \"{1}\" | Add-AzureEndpoint -LBSetName \"{2}\" -Name \"{2}\" -ProbeProtocol \"{3}\"  -Protocol \"{3}\" -PublicPort {4} -ProbePort {4} -LocalPort {5} | Update-AzureVM -verbose";
+            //DEBUG ENABLED - string cmdTemplate = "Get-AzureVM -ServiceName \"{0}\" -Name \"{1}\" | Add-AzureEndpoint -LBSetName \"{2}\" -Name \"{2}\" -ProbeProtocol \"{3}\"  -Protocol \"{3}\" -PublicPort {4} -ProbePort {4} -LocalPort {5} | Update-AzureVM -verbose -debug";
 
             string messageTemplate = "Adding load balanced endpoint for the VM '{0}'";
             string failedMessageTemplate = "Failed to add load balanced endpoint VM '{0}";
@@ -74,7 +75,6 @@ namespace DeployCmdlets4WA.Cmdlet
                 string cmd = string.Format(CultureInfo.InvariantCulture, cmdTemplate, cmdParams);
 
                 ExecutePSCmdlet executeAddAzureEndPointCmd = new ExecutePSCmdlet();
-
                 string message = string.Format(CultureInfo.InvariantCulture, messageTemplate, vmNames[i]);
                 executeAddAzureEndPointCmd.Execute(message, cmd);
                 if (executeAddAzureEndPointCmd.ErrorOccurred == true)
@@ -88,7 +88,8 @@ namespace DeployCmdlets4WA.Cmdlet
         private void AddEndPointsToVMs(string[] vmNames)
         {
             string endpointNameTemplate = EndpointName + "-{0}-{1}";
-            string cmdTemplate = "Get-AzureVM -ServiceName \"{0}\" -Name \"{1}\" | Add-AzureEndpoint -Name \"{2}\" -Protocol \"{3}\" -PublicPort {4} -LocalPort {5} | Update-AzureVM";
+            //DEBUG ENABLED string cmdTemplate = "Get-AzureVM -ServiceName \"{0}\" -Name \"{1}\" | Add-AzureEndpoint -Name \"{2}\" -Protocol \"{3}\" -PublicPort {4} -LocalPort {5} | Update-AzureVM -verbose -debug";
+            string cmdTemplate = "Get-AzureVM -ServiceName \"{0}\" -Name \"{1}\" | Add-AzureEndpoint -Name \"{2}\" -Protocol \"{3}\" -PublicPort {4} -LocalPort {5} | Update-AzureVM -verbose";
 
             string messageTemplate = "Adding endpoint mapping [{0}, {1}] for the VM '{2}'";
             string failedMessageTemplate = "Failed to add endpoint VM '{0}";
@@ -101,7 +102,6 @@ namespace DeployCmdlets4WA.Cmdlet
                 string cmd = string.Format(CultureInfo.InvariantCulture, cmdTemplate, cmdParams);
 
                 ExecutePSCmdlet executeAddAzureEndPointCmd = new ExecutePSCmdlet();
-
                 string message = string.Format(CultureInfo.InvariantCulture, messageTemplate, publicPort, PrivatePort, vmNames[i]);
                 executeAddAzureEndPointCmd.Execute(message, cmd);
                 if (executeAddAzureEndPointCmd.ErrorOccurred == true)

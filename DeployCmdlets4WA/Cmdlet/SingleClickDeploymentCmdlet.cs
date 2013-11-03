@@ -70,7 +70,7 @@ namespace DeployCmdlets4WA.Cmdlet
         private RuntimeDefinedParameterDictionary _runtimeParamsCollection;
         private AutoResetEvent _threadBlocker;
         private DeploymentModelHelper _controller;
-        
+
         private bool _errorsExecutingCmdlet;
         // method to get Downloads folder path
         private static readonly Guid DownloadsFolderGUID = new Guid("374DE290-123F-4565-9164-39C4925E467B");
@@ -540,21 +540,7 @@ namespace DeployCmdlets4WA.Cmdlet
         private static string GetProgramFileLocation()
         {
             string windir = GetWinDir();
-            string programFileLocation = string.Empty;
-
-            using (ManagementObjectSearcher osDetailsFetcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem"))
-            using (ManagementObjectCollection results = osDetailsFetcher.Get())
-            {
-                foreach (ManagementBaseObject eachResult in results)
-                {
-                    using (eachResult)
-                    {
-                        string osArchitecture = eachResult["OSArchitecture"].ToString();
-                        programFileLocation = osArchitecture == "64-bit" ? Path.Combine(windir, "Program Files (x86)") : Path.Combine(windir, "Program Files");
-                        break;
-                    }
-                }
-            }
+            string programFileLocation = OSBitness.Is64BitOperatingSystem() ? Path.Combine(windir, "Program Files (x86)") : Path.Combine(windir, "Program Files");
             return programFileLocation;
         }
 
