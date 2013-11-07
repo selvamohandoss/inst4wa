@@ -16,6 +16,7 @@ namespace DeployCmdlets4WA.Cmdlet
     {
         private const int _retryCount = 5;
         private const int _waitPeriod = 10000;
+        private const int _waitPeriodDiskDelete = 30000;
         private bool _force;
 
         [Parameter(Mandatory = true)]
@@ -330,17 +331,35 @@ namespace DeployCmdlets4WA.Cmdlet
 
         private void DeleteOSDisk(string disk)
         {
-            string removeAzureDiskCmd = string.Format(CultureInfo.InvariantCulture, "Remove-AzureDisk -DiskName \"{0}\" -DeleteVHD", disk);
-
-            ExecutePSCmdlet executeRemoveAzureDiskCmd = new ExecutePSCmdlet();
-            executeRemoveAzureDiskCmd.Execute(string.Format(CultureInfo.InvariantCulture, Resources.DeletingAzureDisk, disk), removeAzureDiskCmd);
-
-            if (executeRemoveAzureDiskCmd.ErrorOccurred == true)
+            int currentRetryCount = 1;
+            int waitPeriodInSeconds = _waitPeriodDiskDelete / 1000;
+            while (true)
             {
-                throw new ApplicationFailedException(string.Format(CultureInfo.InvariantCulture, Resources.ErrorDeletingAzureDisk, disk));
-            }
+                string removeAzureDiskCmd = string.Format(CultureInfo.InvariantCulture, "Remove-AzureDisk -DiskName \"{0}\" -DeleteVHD", disk);
 
-            WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.AzureDiskDeleted, disk));
+                ExecutePSCmdlet executeRemoveAzureDiskCmd = new ExecutePSCmdlet();
+                executeRemoveAzureDiskCmd.Execute(string.Format(CultureInfo.InvariantCulture, Resources.DeletingAzureDisk, disk), removeAzureDiskCmd);
+
+                if (executeRemoveAzureDiskCmd.ErrorOccurred == true)
+                {
+                    if (currentRetryCount == _retryCount)
+                    {
+                        WriteWarning(string.Format(CultureInfo.InvariantCulture, Resources.ErrorDeletingAzureDisk, disk));
+                        break;
+                    }
+                    else
+                    {
+                        WriteWarning(string.Format(CultureInfo.InvariantCulture, Resources.WarnErrorDeletingAzureDisk, disk, waitPeriodInSeconds));
+                        System.Threading.Thread.Sleep(_waitPeriodDiskDelete); //Wait before retry.
+                    }
+                }
+                else
+                {
+                    WriteObject(string.Format(CultureInfo.InvariantCulture, Resources.AzureDiskDeleted, disk));
+                    break;
+                }
+                currentRetryCount++;
+            }
         }
 
         private void ValidateVMName(string vmName)

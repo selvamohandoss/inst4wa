@@ -345,7 +345,7 @@
     <value>Error creating new service with name '{0}'.</value>
   </data>
   <data name="ErrorDeletingAzureDisk" xml:space="preserve">
-    <value>Erorr deleting Azure disk '{0}'.'</value>
+    <value>Erorr deleting Azure disk '{0}'.</value>
   </data>
   <data name="ErrorDeletingVM" xml:space="preserve">
     <value>Error deleting VM '{0}'.</value>
@@ -448,5 +448,8 @@
   </data>
   <data name="MgmtUrlMismatch" xml:space="preserve">
     <value>The subscription you have specified is not meant for targeting the Windows Azure environment you have specified. Please check your subscription and the ServiceEnvironment parameter in your configuration XML file.</value>
+  </data>
+  <data name="WarnErrorDeletingAzureDisk" xml:space="preserve">
+    <value>Erorr deleting Azure disk '{0}'.System will retry after '{1}' seconds.</value>
   </data>
 </root>
