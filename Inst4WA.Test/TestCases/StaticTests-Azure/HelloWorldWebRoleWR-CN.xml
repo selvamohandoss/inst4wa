@@ -23,7 +23,7 @@
     <Parameter Name="CSDEFFile" Value="TestData\WebRole\ServiceDefinition.csdef"></Parameter>
     
     <Parameter Name="RoleName" Value="WebRole"></Parameter>
-    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
+    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\ServiceManagement\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
   </Parameters>
   <Steps>
 

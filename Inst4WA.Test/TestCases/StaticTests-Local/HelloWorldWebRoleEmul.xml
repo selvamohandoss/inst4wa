@@ -15,14 +15,14 @@
     <Parameter Name="CSDEFFile" Value="TestData\WebRole\ServiceDefinition.csdef"></Parameter>
     
     <Parameter Name="RoleName" Value="WebRole"></Parameter>
-    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
+    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\ServiceManagement\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
   </Parameters>
   <Steps>
-
+    
     <Step Type="Cmdlet" Command="Install-AzureSdkForNodeJs" Message="Installing Windows Azure PowerShell for Node.JS">
       <CommandParam Name="AzureNodeSdkLoc" ParameterName="AzurePowershellManifest" />
     </Step>
-
+    
     <!--Load Azure SDK Dll's-->
     <Step Type="Cmdlet" Command="Import-Module" Message="Importing Azure Powershell Modules">
       <CommandParam Name="Name" ParameterName="AzurePowershellManifest" />

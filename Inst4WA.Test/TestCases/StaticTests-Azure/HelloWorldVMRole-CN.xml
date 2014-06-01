@@ -32,7 +32,7 @@
     <Parameter Name="PublicPortOffsetForWinRM" Value="5985"></Parameter>
     <Parameter Name="WinRMEPProtocol" Value="tcp"></Parameter>
 
-    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
+    <Parameter Value="%%Program Files%%\Microsoft SDKs\Windows Azure\PowerShell\ServiceManagement\Azure\Azure.psd1" Name="AzurePowershellManifest"/>
     <Parameter Name="PublishSettingsFilePath" Value="Azure.publishsettings"></Parameter>
     <Parameter Name="OSSInstallScript" Value="TestData\VMRole\enable-web-server.ps1"></Parameter>
 
