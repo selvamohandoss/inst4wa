@@ -3,6 +3,12 @@ Inst4WA - Simple Deployment Framework for Windows Azure
 
 ## Introduction
 
+## Testing
+
+This comment is added only for testing purpose. Not to taken seriously.
+
+## Introduction
+
 This tool consists of a commandline tool and a set of commandlets for deploying open source software to Windows Azure by specifying a very simple configuration file. The following sections describe how to use the tool for deploying a Hello world type solution as well as Apache CouchDB and Solr to Windows Azure. This is followed by instructions for how to run the automated test suite that is included in the project.
 
 ## Start Here - Common Steps for Using the Tool
