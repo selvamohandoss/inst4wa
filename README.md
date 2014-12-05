@@ -106,3 +106,4 @@ Please refer to the ReadMe at the https://github.com/MSOpenTech/Windows-Azure-So
 - Use the TestCaseDirs setting to specify a directory name pattern to select cmdlet-specific dynamic test cases to run.
 
 - Use the StaticTestCaseFiles setting to specify a file name pattern to select specific static tests to run.
+- Comment is only given for testing purposes
