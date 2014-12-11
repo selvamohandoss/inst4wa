@@ -8,6 +8,7 @@ Inst4WA - Simple Deployment Framework for Windows Azure
 This comment is added only for testing purpose. Not to taken seriously.
 
 Test comment to evaluate CLA work flow
+Test comment to evaluate CLA work flow
 
 ## Introduction
 
