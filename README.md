@@ -24,7 +24,7 @@ The following steps are common to all the sections below:
 3. If you would rather download the source code and build it yourself, you can do so by clicking on the ZIP button above. Note that the zip file has a long file name that will cause problems while building, so you will need to rename the folder name to make it short. You will need Visual Studio 2010 Ultimate Edition, the Windows Azure SDK 2.4, Azure Powershell 0.8.4 and SQL Server Compact Edition 3.5. There is a build.cmd file in the root that you can run to do a full build.
 
 4. Change directory to the build\Debug or build\Release folder.
-
+df
 5. If you are going to use the configuration files given below without modification, then you will need to replace "Azure.publishsettings" with the publish setting file containing your Azure subscription details. You can also create your own configuration files and then choose to either not specify the publishsettings file (in which case the tool will ask you to download it from Azure portal) or use your own path to your publishsettings file.
 
 6. Please make sure that you unblock all the dll's and config files using instructions at http://msdn.microsoft.com/en-us/library/ee890038(VS.100).aspx. 
