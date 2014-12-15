@@ -1,5 +1,5 @@
 @echo off
-
+@echo test cpmmit
 setlocal
 
 if "%1"=="/?" goto usage
