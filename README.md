@@ -21,6 +21,30 @@ The following steps are common to all the sections below:
 
 2. The recommended way is to download and expand the binaries for the latest build located at http://msopentechrelease.blob.core.windows.net/inst4wa/Inst4wa.zip and skip to step 3 in the next section. 
 
+
+Inst4WA - Simple Deployment Framework for Windows Azure
+=======================================================
+
+## Introduction
+
+## Testing
+
+This comment is added only for testing purpose. Not to taken seriously.
+
+Test comment to evaluate CLA work flow
+Test comment to evaluate CLA work flow
+## Introduction
+
+This tool consists of a commandline tool and a set of commandlets for deploying open source software to Windows Azure by specifying a very simple configuration file. The following sections describe how to use the tool for deploying a Hello world type solution as well as Apache CouchDB and Solr to Windows Azure. This is followed by instructions for how to run the automated test suite that is included in the project.
+
+## Start Here - Common Steps for Using the Tool
+
+The following steps are common to all the sections below:
+
+1. Powershell 3.0 is required to run this installer. Please follow the instructions described at http://technet.microsoft.com/en-us/library/hh847837.aspx to install Powershell 3.0.
+
+2. The recommended way is to download and expand the binaries for the latest build located at http://msopentechrelease.blob.core.windows.net/inst4wa/Inst4wa.zip and skip to step 3 in the next section. 
+
 3. If you would rather download the source code and build it yourself, you can do so by clicking on the ZIP button above. Note that the zip file has a long file name that will cause problems while building, so you will need to rename the folder name to make it short. You will need Visual Studio 2010 Ultimate Edition, the Windows Azure SDK 2.4, Azure Powershell 0.8.4 and SQL Server Compact Edition 3.5. There is a build.cmd file in the root that you can run to do a full build.
 
 4. Change directory to the build\Debug or build\Release folder.
